@@ -1,0 +1,47 @@
+Propellerhead Remote Mapping File
+File Format Version 1.0.0
+Control Surface Manufacturer Community
+Control Surface Model Stream Deck+ Remote
+Map Version 1.0.0
+
+Scope Propellerheads Combinator
+// Control Surface Item	Key	Remotable Item	Scale	Mode
+Map	Knob 1		Rotary 1
+Map	Knob 2		Rotary 2
+Map	Knob 3		Rotary 3
+Map	Knob 4		Rotary 4
+Map	Button 1		Button 1
+Map	Button 2		Button 2
+Map	Button 3		Select Previous Patch
+Map	Button 4		Select Next Patch
+
+Scope Propellerheads SubTractor Analog Synthesizer
+Define Group Variation Filters Osc & Mod
+// Control Surface Item	Key	Remotable Item	Scale	Mode
+Map	Knob 1		Filter Freq		Filters
+Map	Knob 2		Filter Res		Filters
+Map	Knob 3		Filter Env Amount		Filters
+Map	Knob 4		Master Level		Filters
+Map	Button 3		Select Previous Patch
+Map	Button 4		Select Next Patch
+
+Scope Propellerheads NN-XT Advanced Sampler
+// Control Surface Item	Key	Remotable Item	Scale	Mode
+Map	Knob 1		Filter Freq
+Map	Knob 2		Filter Res
+Map	Knob 3		Amp Env Attack
+Map	Knob 4		Amp Env Decay
+Map	Button 3		Select Previous Patch
+Map	Button 4		Select Next Patch
+
+Scope Propellerheads Reason Master Section
+// Control Surface Item	Key	Remotable Item	Scale	Mode
+Map	Knob 1		Master Level
+Map	Knob 2		Ctrl Room Level
+
+Scope Propellerheads Mixer 14:2
+// Control Surface Item	Key	Remotable Item	Scale	Mode
+Map	Knob 1		Channel 1 Level
+Map	Knob 2		Channel 2 Level
+Map	Knob 3		Channel 3 Level
+Map	Knob 4		Channel 4 Level

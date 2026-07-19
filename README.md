@@ -40,6 +40,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\install-profile.ps1 -Resta
 | `verify-profile.ps1` | Check page labels/CCs |
 | `package-streamdeck.ps1` | Build release zip |
 | `build-profile.ps1` | Rebuild from local Stream Deck templates (maintainers); `-KnobLayout Maximize` or `Compact` |
+| [`reason-streamdeck-remote/`](reason-streamdeck-remote/) | **Separate** Reason Remote surface (dual-port MIDI feedback). Uses `loopMIDI Port 1`/`2` — not `loopMIDI Port`. See that folder’s README. |
 
 ## Pages
 

@@ -1,0 +1,16 @@
+{
+    "AppIdentifier":  "D:\\Program Files\\Propellerhead\\Reason 13\\Reason.exe",
+    "Device":  {
+                   "Model":  "20GBD9901",
+                   "UUID":  "@(1)[4057/132/A00WA5241M38AB]"
+               },
+    "Name":  "Reason - Remote",
+    "Pages":  {
+                  "Current":  "5d7e2e87-1396-4748-ac2b-0c3ca7c4d864",
+                  "Default":  "dbb004b4-d7d6-4026-b699-93c722ccab4d",
+                  "Pages":  [
+                                "5d7e2e87-1396-4748-ac2b-0c3ca7c4d864"
+                            ]
+              },
+    "Version":  "3.0"
+}
