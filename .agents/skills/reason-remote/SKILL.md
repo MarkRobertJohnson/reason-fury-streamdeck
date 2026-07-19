@@ -108,6 +108,7 @@ Reference implementation: Fury helpers in [`StreamDeckPlusRemote.lua`](../../../
 - Return an empty table `{}` from `remote_deliver_midi` when idle (not only `nil`).
 - Keep demo / other-scope items on `define_auto_inputs` / `define_auto_outputs`; only intercept the new device’s CC range in `remote_process_midi`.
 - Discrete params: codec `max` matches remotable (e.g. 3, 10, 1); pickup band `0` for those, `~10` for continuous 0–127.
+- **Latch after pickup:** once a dial locks, pass all further CCs through. Continuous crossing-style checks while Reason lags cause fast Deck spins to “stick”. Re-arm pickup only on scope enable or external Reason changes after a short settle time.
 - Background Deck pages may look stale until shown; dump still updates MIDI plugin state for when the user navigates.
 
 ```mermaid

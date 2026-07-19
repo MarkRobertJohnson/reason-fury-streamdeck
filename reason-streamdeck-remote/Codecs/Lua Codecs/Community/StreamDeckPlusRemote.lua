@@ -14,6 +14,11 @@ g_fury_scope_was_enabled = false
 g_fury_dirty = {}
 g_fury_last_sent = {}
 g_fury_last_physical = {}
+-- Once pickup succeeds, stay latched so fast Deck spins are not blocked by
+-- lagging get_item_value (crossing-style pickup sticks when Reason lags).
+g_fury_synced = {}
+g_fury_last_input_ms = {}
+g_fury_settle_ms = 150
 
 function fury_queue_index(index)
   if g_fury_by_index[index] ~= nil then
@@ -59,26 +64,38 @@ function fury_make_feedback_midi(meta, value)
   return remote.make_midi(string.format("b0 %02x %02x", meta.cc, v))
 end
 
--- Soft takeover: true when Deck value has crossed / matched Reason's value.
+function fury_pickup_band(max_val)
+  if max_val ~= nil and max_val <= 10 then
+    return 0
+  end
+  return 10
+end
+
+-- Soft takeover until first lock: match within band, or cross Reason's value.
+-- After lock (g_fury_synced), callers must not use this — pass all CCs through.
 function fury_pickup_allows(data_value, reason_value, last_physical, max_val)
   if reason_value == nil then
     return false
   end
-  local band = 10
-  if max_val ~= nil and max_val <= 10 then
-    band = 0
-  end
+  local band = fury_pickup_band(max_val)
   if last_physical == nil or last_physical < 0 then
     local diff = data_value - reason_value
     if diff < 0 then diff = -diff end
     return diff <= band
   end
-  if last_physical < reason_value then
-    return data_value >= reason_value
-  elseif last_physical > reason_value then
-    return data_value <= reason_value
+  -- Crossing OR jump that lands past the target (fast absolute CC bursts).
+  if last_physical < reason_value and data_value >= reason_value then
+    return true
   end
-  return true
+  if last_physical > reason_value and data_value <= reason_value then
+    return true
+  end
+  if last_physical == reason_value then
+    return true
+  end
+  local diff = data_value - reason_value
+  if diff < 0 then diff = -diff end
+  return diff <= band
 end
 
 function remote_init()
@@ -165,6 +182,8 @@ function remote_init()
   g_fury_dirty = {}
   g_fury_last_sent = {}
   g_fury_last_physical = {}
+  g_fury_synced = {}
+  g_fury_last_input_ms = {}
   g_fury_scope_was_enabled = false
   g_fury_volume_index = 9
 
@@ -185,6 +204,8 @@ function remote_init()
       max = fury_max[i],
     }
     g_fury_last_physical[index] = -1
+    g_fury_synced[index] = false
+    g_fury_last_input_ms[index] = 0
     if kind == "cc" then
       g_fury_cc_to_index[cc] = index
     end
@@ -299,6 +320,8 @@ function remote_set_state(changed_items)
     for index, _ in pairs(g_fury_by_index) do
       g_fury_last_physical[index] = -1
       g_fury_last_sent[index] = nil
+      g_fury_synced[index] = false
+      g_fury_last_input_ms[index] = 0
     end
   end
   g_fury_scope_was_enabled = enabled
@@ -307,9 +330,27 @@ function remote_set_state(changed_items)
     return
   end
 
+  local now = remote.get_time_ms()
   local i = 1
   while i <= table.getn(changed_items) do
-    fury_queue_index(changed_items[i])
+    local item_index = changed_items[i]
+    fury_queue_index(item_index)
+    -- Re-arm pickup only for external Reason changes (not our own handle_input echo).
+    if g_fury_by_index[item_index] ~= nil and g_fury_synced[item_index] then
+      local elapsed = now - g_fury_last_input_ms[item_index]
+      if elapsed > g_fury_settle_ms then
+        local meta = g_fury_by_index[item_index]
+        local reason_value = fury_get_value(item_index)
+        local phys = g_fury_last_physical[item_index]
+        if reason_value ~= nil and phys ~= nil and phys >= 0 then
+          local diff = phys - reason_value
+          if diff < 0 then diff = -diff end
+          if diff > fury_pickup_band(meta.max) then
+            g_fury_synced[item_index] = false
+          end
+        end
+      end
+    end
     i = i + 1
   end
 end
@@ -383,9 +424,18 @@ function remote_process_midi(event)
     last_phys = -1
   end
 
+  -- Latched: pass every CC through (Stream Deck absolute bursts lag Reason otherwise).
+  if g_fury_synced[index] then
+    remote.handle_input({ time_stamp = event.time_stamp, item = index, value = data })
+    g_fury_last_input_ms[index] = remote.get_time_ms()
+    g_fury_last_physical[index] = data
+    return true
+  end
+
   if fury_pickup_allows(data, reason_value, last_phys, meta.max) then
-    local msg = { time_stamp = event.time_stamp, item = index, value = data }
-    remote.handle_input(msg)
+    remote.handle_input({ time_stamp = event.time_stamp, item = index, value = data })
+    g_fury_synced[index] = true
+    g_fury_last_input_ms[index] = remote.get_time_ms()
   end
   g_fury_last_physical[index] = data
   return true
