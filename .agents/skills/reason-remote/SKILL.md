@@ -93,6 +93,7 @@ This project’s surface:
 4. Easy MIDI not claiming Port 1/2.
 5. Fully restart Reason/Recon.
 6. Preferences → Info on control surface error for the report string.
+7. Recon ASSERT in `MIDIUtils.cpp` on feedback → knob auto_outputs must use `x="value"` when items have `min=0, max=127` (not `127*value`).
 
 ## More detail
 

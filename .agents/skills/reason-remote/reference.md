@@ -61,6 +61,7 @@ end
 - Knobs with `min=0, max=127` typically omit `value=` on inputs (raw `xx`).
 - Buttons often use `value="x/127"`.
 - Feedback requires `output="value"` on items **and** matching `define_auto_outputs`.
+- For items with `min=0, max=127`, use `x="value"` in auto_outputs (not `127*value`). Wrong scaling overflows MIDI data bytes and can assert in Recon Logging builds (`MIDIUtils.cpp`).
 
 Manufacturer/model strings in `.luacodec` must match the remotemap header fields exactly.
 

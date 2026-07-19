@@ -34,11 +34,15 @@ function remote_init()
 
   local outputs =
   {
-    {name="Knob 1", pattern="b0 14 xx", x="127*value"},
-    {name="Knob 2", pattern="b0 15 xx", x="127*value"},
-    {name="Knob 3", pattern="b0 16 xx", x="127*value"},
-    {name="Knob 4", pattern="b0 17 xx", x="127*value"},
+    -- Knobs declare min=0 max=127, so `value` is already 0..127 for MIDI xx.
+    -- Using 127*value here overflows the data byte and trips Recon asserts
+    -- (MIDIUtils.cpp) when sending feedback to loopMIDI.
+    {name="Knob 1", pattern="b0 14 xx", x="value"},
+    {name="Knob 2", pattern="b0 15 xx", x="value"},
+    {name="Knob 3", pattern="b0 16 xx", x="value"},
+    {name="Knob 4", pattern="b0 17 xx", x="value"},
 
+    -- Buttons are normalized 0..1
     {name="Button 1", pattern="b0 1e xx", x="127*value"},
     {name="Button 2", pattern="b0 1f xx", x="127*value"},
     {name="Button 3", pattern="b0 20 xx", x="127*value"},
