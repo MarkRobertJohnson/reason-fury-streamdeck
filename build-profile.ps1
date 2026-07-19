@@ -410,7 +410,7 @@ if ($KnobLayout -eq 'Maximize') {
     '1,0' = New-FixedStepDial 'BPM Rate' 14 10
     '2,0' = New-MultiAction @(
       @{ Name = 'Depth'; CC = 16 }
-      @{ Name = 'SyncMode'; CC = 31 }
+      @{ Name = 'SyncMode'; CC = 31; FixedMax = 1 }
     ) 2
     '3,0' = New-FixedShapeDial 'Shape' 30
   }
@@ -453,7 +453,7 @@ if ($KnobLayout -eq 'Maximize') {
       @{ Name = 'Free Rate'; CC = 13 }
       @{ Name = 'BPM Rate'; CC = 14; FixedMax = 10 }
       @{ Name = 'Depth'; CC = 16 }
-      @{ Name = 'SyncMode'; CC = 31 }
+      @{ Name = 'SyncMode'; CC = 31; FixedMax = 1 }
     ) 4
     '1,0' = New-FixedShapeDial 'Shape' 30
   }

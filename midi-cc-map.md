@@ -52,9 +52,9 @@ The `Reason - Fury` Stream Deck+ profile maps these CCs by UI group:
 | Core | Volume 7, Glide 5, Bend 15, Mode 24 |
 | Oscillator | Sub/Detune (Multi 26/27), Reese 28, FM 29, Shape 25 (Fixed steps 0–3: Saw/Square/Hybrid/Growl) |
 | Growl | Growl/Vowel (Multi 12/17), Bite 18, Cutoff 74, Res 71 |
-| Motion | Free Rate 13, BPM Rate 14 (Fixed 0–10: BAR…1/128), Depth/SyncMode (Multi 16/31), Shape 30 (Fixed 0–3: Sine/Triangle/Square/Ramp) |
+| Motion | Free Rate 13, BPM Rate 14 (Fixed 0–10: BAR…1/128), Depth/SyncMode (Multi 16/31; SyncMode Fixed 0–1 Free/Tempo), Shape 30 (Fixed 0–3: Sine/Triangle/Square/Ramp) |
 | Output | ShapePre/Drive (Multi 36/19), Fold 20, Crush 21, Width/Limiter (Multi 22/23) |
 | Articulation | Punch 37, Decay 33, Attack 35, Release 34 |
 | Performance | Pitch bend (PB); Mod wheel CC1 |
 
-Shape dials use Fixed Min/Max `0–3` (step size 1); BPM Rate uses Fixed `0–10` for the 11 sync divisions. Each click is a selector index, not a 0–127 band. Keypad on every control page: section jump buttons (Core/Osc/Growl/Motion/Out/Art/Perf) and a **Notes** folder (bass note pads; not a top-level swipe page).
+Shape dials use Fixed Min/Max `0–3` (step size 1); BPM Rate uses Fixed `0–10` for the 11 sync divisions; SyncMode uses Fixed `0–1` (Free / Tempo). Each click is a selector index, not a 0–127 band. Keypad on every control page: section jump buttons (Core/Osc/Growl/Motion/Out/Art/Perf) and a **Notes** folder (bass note pads; not a top-level swipe page).

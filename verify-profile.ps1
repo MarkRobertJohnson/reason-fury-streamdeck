@@ -57,7 +57,7 @@ if ($KnobLayout -eq 'Maximize') {
       @{ Pos = '0,0'; Kind = 'dial'; Name = 'Free Rate'; CC = 13 }
       @{ Pos = '1,0'; Kind = 'fixed'; Name = 'BPM Rate'; CC = 14; MaxStep = 10 }
       @{ Pos = '2,0'; Kind = 'multi'; Slots = @(
-        @{ Name = 'Depth'; CC = 16 }, @{ Name = 'SyncMode'; CC = 31 }
+        @{ Name = 'Depth'; CC = 16 }, @{ Name = 'SyncMode'; CC = 31; FixedMax = 1 }
       )}
       @{ Pos = '3,0'; Kind = 'fixed'; Name = 'Shape'; CC = 30; MaxStep = 3 }
     )
@@ -92,7 +92,7 @@ if ($KnobLayout -eq 'Maximize') {
       @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
         @{ Name = 'Free Rate'; CC = 13 },
         @{ Name = 'BPM Rate'; CC = 14; FixedMax = 10 },
-        @{ Name = 'Depth'; CC = 16 }, @{ Name = 'SyncMode'; CC = 31 }
+        @{ Name = 'Depth'; CC = 16 }, @{ Name = 'SyncMode'; CC = 31; FixedMax = 1 }
       )}
       @{ Pos = '1,0'; Kind = 'fixed'; Name = 'Shape'; CC = 30; MaxStep = 3 }
     )
