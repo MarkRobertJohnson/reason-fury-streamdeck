@@ -56,6 +56,5 @@ jobs:
             --target $env:GITHUB_SHA `
             --title "Release $env:TAG" `
             --generate-notes `
-            --fail-on-no-commits `
             "dist/Reason-Fury-StreamDeck.zip" `
             "dist/Reason-StreamDeck-Remote.zip"
