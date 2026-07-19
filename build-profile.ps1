@@ -115,6 +115,13 @@ function Set-PitchBendDial($action, [string]$name) {
   $s.ch_t = '1'
   $s.a20 = 'Ultra'
   if ($null -ne $s.PSObject.Properties['rcx']) { $s.rcx = '16383' }
+  # Press encoder to reset pitch bend to center (no offset).
+  $s.ppsa = 'PB'
+  $s.ppcn = '8192'
+  $s.ppch = '1'
+  $s.ppsh = $true
+  $s.ppsc = $true
+  $s.ppsv = $false
 }
 
 function Set-FixedStepDial($action, [string]$name, [int]$cc, [int]$maxStep) {

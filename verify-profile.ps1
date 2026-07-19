@@ -201,6 +201,9 @@ foreach ($pageName in $Expected.Keys) {
       if ($s.rn1 -ne $exp.Name -or $s.rsa -ne 'PB') {
         $errors += "$pageName $($exp.Pos): expected pitch bend $($exp.Name)/PB, got $($s.rn1)/$($s.rsa)"
       }
+      if ($s.ppsa -ne 'PB' -or [string]$s.ppcn -ne '8192') {
+        $errors += "$pageName $($exp.Pos): expected press reset ppsa=PB ppcn=8192, got ppsa=$($s.ppsa) ppcn=$($s.ppcn)"
+      }
     } elseif ($exp.Kind -eq 'multi') {
       $i = 1
       foreach ($slot in $exp.Slots) {
