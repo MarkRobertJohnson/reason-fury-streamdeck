@@ -1,0 +1,16 @@
+{
+    "Controllers":  [
+                        {
+                            "Actions":  null,
+                            "Type":  "Keypad"
+                        },
+                        {
+                            "Actions":  {
+
+                                        },
+                            "Type":  "Encoder"
+                        }
+                    ],
+    "Icon":  "",
+    "Name":  ""
+}

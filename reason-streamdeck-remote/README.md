@@ -11,13 +11,13 @@ This is **not** an official Elgato or Reason Studios product. It registers in Pr
 
 | Piece | Role |
 | --- | --- |
-| Lua codec + `.luacodec` | Defines 4 knobs + 4 buttons with CC in **and** CC out (feedback) |
-| `.remotemap` | Must be named `Community Stream Deck+ Remote.remotemap` (Manufacturer + Model). Scopes: Combinator, SubTractor, NN-XT, Master Section, Mixer 14:2 |
-| Companion Stream Deck profile | Trevliga Spel dials using **separate** In/Out ports |
+| Lua codec + `.luacodec` | Demo knobs/buttons + Fury params (CC in **and** out) |
+| `.remotemap` | Must be named `Community Stream Deck+ Remote.remotemap`. Scopes: Combinator, SubTractor, NN-XT, Master Section, Mixer 14:2, **Fury** (`Local Developer` / `com.local.Fury`) |
+| Companion Stream Deck profiles | **Reason - Remote** (demo) and **Reason - Fury Remote** (Maximize Fury layout) |
 
 Feedback is **change / remap driven** (Reason pushes values when parameters change or the surface remaps). There is no on-demand “dump all values” button in Reason.
 
-## Port conventions (do not collide with Fury)
+## Port conventions (do not collide with Fury Bus)
 
 | Port | Direction | Used by |
 | --- | --- | --- |
@@ -31,8 +31,11 @@ Never use one port for both In and Out (MIDI feedback loop).
 
 | Control | CC | Codec item |
 | --- | --- | --- |
-| Encoder 1–4 | 20–23 | Knob 1–4 |
+| Demo encoders 1–4 | 20–23 | Knob 1–4 |
 | Keypad Btn 1–4 | 30–33 | Button 1–4 |
+| Fury Maximize params | 40–68 | See [`fury-remote-cc-map.md`](fury-remote-cc-map.md) |
+| Mod Wheel | 1 | Mod Wheel |
+| Pitch Bend | PB (e0) | Pitch Bend |
 
 ## Install
 
@@ -47,9 +50,9 @@ There are **two** installs (do not skip the Reason one):
 | Step | Script | Where it shows up |
 | --- | --- | --- |
 | A. Reason Remote codec + map | `install-remote.ps1` | Preferences → MIDI → Add manually → Manufacturer **Community** |
-| B. Stream Deck companion profile | `build-remote-profile.ps1` + `install-streamdeck-profile.ps1` | Stream Deck app profile dropdown → **Reason - Remote** |
+| B. Stream Deck companion profile | `build-*-profile.ps1` + `install-streamdeck-profile.ps1` | Stream Deck app → **Reason - Remote** or **Reason - Fury Remote** |
 
-`build-remote-profile.ps1` / `install-streamdeck-profile.ps1` alone will **not** add anything to Reason’s manufacturer list.
+`build-*-profile.ps1` / `install-streamdeck-profile.ps1` alone will **not** add anything to Reason’s manufacturer list.
 
 Works with **Reason** and **Reason Recon** (same `%PROGRAMDATA%\Propellerhead Software\Remote\` folder).
 
@@ -72,47 +75,51 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\install-remote.ps1
 7. In **Easy MIDI Inputs**, **uncheck** Port 1 and Port 2 so Remote owns them exclusively
 8. If ports/OK stay disabled with **Remote Mapping file cannot be found**, re-run `install-remote.ps1` and **fully restart** Recon. The map filename must be exactly `Community Stream Deck+ Remote.remotemap` (tab-delimited inside).
 
-### 3. Install companion Stream Deck profile
+### 3. Install companion Stream Deck profile(s)
 
 Guards: Device.UUID, no UTF-8 BOM, UPPERCASE on-disk page folder GUIDs. See [`.agents/skills/streamdeck-profiles`](../.agents/skills/streamdeck-profiles).
+
+**Demo (4 knobs):**
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build-remote-profile.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\install-streamdeck-profile.ps1 -Restart
 ```
 
-Or both sides at once:
+**Fury two-way (Maximize pages):**
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\install-remote.ps1 -AlsoInstallProfile -RestartStreamDeck
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build-fury-remote-profile.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\install-streamdeck-profile.ps1 -ProfileName 'Reason - Fury Remote' -SourceRelative 'StreamDeck\Reason-Fury-Remote.sdProfile' -Restart
 ```
 
-In the **Stream Deck** app (not Reason), select profile **Reason - Remote**.
+Or codec + both profiles:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\install-remote.ps1 -AlsoInstallProfile -Profile Both -RestartStreamDeck
+```
+
+In the **Stream Deck** app, select **Reason - Fury Remote** (or **Reason - Remote** for the Combinator demo).
 
 ### 4. Prove feedback
 
-1. Create/select a **Combinator** (or SubTractor / NN-XT).
-2. Turn a mapped knob in Reason’s UI — the matching Stream Deck dial should move.
-3. Turn the Stream Deck dial — the Reason parameter should follow.
+**Demo:** select a Combinator; turn Rotary 1 in Reason — Deck Knob 1 should move.
+
+**Fury:** select a Fury instance; turn Cutoff on the device — Deck Growl page Cutoff should follow. Turn Deck Volume — Fury Volume moves.
 
 If the Deck does not update until you touch it, select/lock the device again (Reason often pushes feedback on remap).
 
 ## Extending maps
 
 1. In Reason, select a device → **File → Export Device Remote Info**
-2. Copy remotable item names into [`Maps/Community/Stream Deck+ Remote.remotemap`](Maps/Community/Stream%20Deck+%20Remote.remotemap) under a new `Scope …` block
-3. Re-run `install-remote.ps1` and restart Reason
+2. Copy remotable item names into [`Maps/Community/Community Stream Deck+ Remote.remotemap`](Maps/Community/Community%20Stream%20Deck+%20Remote.remotemap) under a new `Scope …` block
+3. For Fury, remotables live in [`Fury.remoteinfo.txt`](Fury.remoteinfo.txt); Scope is `Local Developer` / `com.local.Fury` (not Propellerheads)
+4. Re-run `install-remote.ps1` and restart Reason
 
 Map lines are **tab-delimited**:
 
 ```text
-Map<TAB>Knob 1<TAB><TAB>Remotable Item Name
-```
-
-With a variation/mode column (empty Scale):
-
-```text
-Map<TAB>Knob 1<TAB><TAB>Filter Freq<TAB><TAB>Filters
+Map<TAB>Volume<TAB><TAB>Volume
 ```
 
 ## Agents / maintainers
@@ -123,7 +130,7 @@ Map<TAB>Knob 1<TAB><TAB>Filter Freq<TAB><TAB>Filters
 After Deck profile install:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File ..\verify-profile-load.ps1 -Name 'Reason - Remote'
+powershell -NoProfile -ExecutionPolicy Bypass -File ..\verify-profile-load.ps1 -Name 'Reason - Fury Remote'
 ```
 
 ## Layout in this folder
@@ -131,28 +138,40 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ..\verify-profile-load.ps1 -
 ```text
 reason-streamdeck-remote/
   README.md
+  fury-remote-cc-map.md           # Fury codec CC ↔ page table
+  Fury.remoteinfo.txt             # Export Device Remote Info
   install-remote.ps1              # codec + map → Reason Remote dirs
-  build-remote-profile.ps1        # build companion .sdProfile
+  build-remote-profile.ps1        # Reason - Remote demo profile
+  build-fury-remote-profile.ps1   # Reason - Fury Remote Maximize profile
   install-streamdeck-profile.ps1  # install into ProfilesV3
   Codecs/Lua Codecs/Community/    # .luacodec .lua .png
   Maps/Community/                 # .remotemap
   StreamDeck/Reason-Remote.sdProfile/
+  StreamDeck/Reason-Fury-Remote.sdProfile/
 ```
 
-## Coexistence with Reason-Fury
+## Coexistence
 
-| | Reason-Fury | Reason-Remote (this) |
-| --- | --- | --- |
-| Path | External Control Bus + Fury CC chart | Remote codec + remotemap |
-| Ports | `loopMIDI Port` | `loopMIDI Port 1` + `Port 2` |
-| Sync | One-way Deck → Reason | Bidirectional (change-driven) |
-| Profile name | Reason - Fury | Reason - Remote |
+| | Reason-Fury | Reason-Remote (demo) | Reason-Fury Remote |
+| --- | --- | --- | --- |
+| Path | External Control Bus + Fury CC chart | Remote codec + Combinator maps | Remote codec + Fury scope |
+| Ports | `loopMIDI Port` | Port 1 + Port 2 | Port 1 + Port 2 |
+| Sync | One-way Deck → Reason | Bidirectional | Bidirectional |
+| Profile | Reason - Fury | Reason - Remote | Reason - Fury Remote |
+| CCs | Fury `midi_cc_chart` (7, 5, …) | Codec 20–23 | Codec 40–68 (+ Mod/PB) |
 
-Both can be installed at once. Switch Stream Deck profiles depending on which path you want; keep the port assignments above so they never share a cable.
+All three can be installed at once. Switch Stream Deck profiles depending on which path you want; keep the port assignments above so they never share a cable.
+
+## Troubleshooting
+
+| Symptom | Fix |
+| --- | --- |
+| *"Control surface inactivated"* on Recon start | Codec Lua error — reinstall `install-remote.ps1` and fully restart. Pitch Bend outputs must use `bit.band` / `bit.rshift` (not `bitand` / `bitshift`). Check Preferences → red error icon for details. |
+| No Fury mapping when Fury selected | Scope must be `Local Developer` / `com.local.Fury`; reinstall map + restart |
 
 ## Limitations
 
 - Not a full dump of patch state on demand
 - Background Stream Deck pages may not update until shown
 - Remotable names ≠ Fury External Bus CC numbers
-- Starter map covers a few devices; expand via Export Device Remote Info
+- Fury Scope/Spectrum/patch remotables not mapped in v1

@@ -1,0 +1,22 @@
+{
+    "AppIdentifier":  "D:\\Program Files\\Propellerhead\\Reason 13\\Reason.exe",
+    "Device":  {
+                   "Model":  "20GBD9901",
+                   "UUID":  "@(1)[4057/132/A00WA5241M38AB]"
+               },
+    "Name":  "Reason - Fury Remote",
+    "Pages":  {
+                  "Current":  "07760854-e434-48f9-b080-84085dfef1d6",
+                  "Default":  "d8e9c73d-e051-4732-a5f0-8c20384d6cd2",
+                  "Pages":  [
+                                "07760854-e434-48f9-b080-84085dfef1d6",
+                                "8de1a4a6-4e80-4f0b-9f40-d71db3f53ef2",
+                                "b8373380-8423-4ab4-9dfe-868c8bf1ad10",
+                                "76d60894-b2e1-4da0-a1f4-494b06b27d99",
+                                "9627c311-b052-48a4-a71d-050c86935f69",
+                                "2dd19859-061e-49a7-87ce-654d65e4ba23",
+                                "304a86c6-0655-4552-93af-1ced990a3c13"
+                            ]
+              },
+    "Version":  "3.0"
+}

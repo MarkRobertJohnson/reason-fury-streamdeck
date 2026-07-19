@@ -1,22 +1,33 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Install Reason-Remote.sdProfile into Stream Deck ProfilesV3.
+  Install a companion Stream Deck profile from StreamDeck\ into ProfilesV3.
+
+.PARAMETER ProfileName
+  Display name in Stream Deck (and used to remove prior installs). Default: Reason - Remote
+
+.PARAMETER SourceRelative
+  Path under this folder to the .sdProfile. Default: StreamDeck\Reason-Remote.sdProfile
+
+.PARAMETER Restart
+  Restart Stream Deck after install.
 #>
 param(
+  [string]$ProfileName = 'Reason - Remote',
+  [string]$SourceRelative = 'StreamDeck\Reason-Remote.sdProfile',
   [switch]$Restart
 )
 
 $ErrorActionPreference = 'Stop'
 
-$Source = Join-Path $PSScriptRoot 'StreamDeck\Reason-Remote.sdProfile'
+$Source = Join-Path $PSScriptRoot $SourceRelative
 $ProfilesV3 = Join-Path $env:APPDATA 'Elgato\StreamDeck\ProfilesV3'
 $PluginRoot = Join-Path $env:APPDATA 'Elgato\StreamDeck\Plugins\se.trevligaspel.midi.sdPlugin'
 $PluginMarker = 'se.trevligaspel.midi.sdPlugin'
 $Placeholder = '__TREVLIGA_PLUGIN__'
 
 if (-not (Test-Path $Source)) {
-  throw "Missing profile: $Source - run .\build-remote-profile.ps1 first."
+  throw "Missing profile: $Source - run the matching build-*-profile.ps1 first."
 }
 if (-not (Test-Path $ProfilesV3)) {
   throw "Stream Deck ProfilesV3 not found: $ProfilesV3"
@@ -50,7 +61,7 @@ function Get-LocalDeviceBinding {
     if (-not (Test-Path $m)) { continue }
     try {
       $j = Get-Content -Raw $m | ConvertFrom-Json
-      if ($j.Name -eq 'Reason - Remote') { continue }
+      if ($j.Name -eq $ProfileName) { continue }
       if ($j.Device.Model -and $j.Device.UUID) {
         return [pscustomobject]@{ Model = [string]$j.Device.Model; UUID = [string]$j.Device.UUID }
       }
@@ -60,8 +71,6 @@ function Get-LocalDeviceBinding {
 }
 
 function Write-Utf8NoBom([string]$path, [string]$text) {
-  # Windows PowerShell Set-Content -Encoding UTF8 writes a BOM; Stream Deck
-  # ignores profiles whose root manifest.json starts with EF BB BF.
   $utf8 = New-Object System.Text.UTF8Encoding $false
   [System.IO.File]::WriteAllText($path, $text, $utf8)
 }
@@ -95,7 +104,7 @@ Get-ChildItem $ProfilesV3 -Directory -ErrorAction SilentlyContinue | ForEach-Obj
   if (Test-Path $m) {
     try {
       $j = Get-Content -Raw $m | ConvertFrom-Json
-      if ($j.Name -eq 'Reason - Remote') {
+      if ($j.Name -eq $ProfileName) {
         Remove-Item -Recurse -Force $_.FullName
       }
     } catch {}
@@ -119,7 +128,7 @@ Set-ProfileDeviceBinding $dest $binding
 
 Write-Host "Installed Stream Deck profile:"
 Write-Host "  $dest"
-Write-Host "Select profile: Reason - Remote"
+Write-Host "Select profile: $ProfileName"
 Write-Host "Device: Model=$($binding.Model) UUID=$($binding.UUID)"
 Write-Host "Ports: Out=loopMIDI Port 1, In=loopMIDI Port 2"
 

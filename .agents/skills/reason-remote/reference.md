@@ -95,14 +95,22 @@ Must be `{Manufacturer} {Model}.remotemap`:
 
 ## Ports vs Fury External Bus
 
-| | Fury (External Bus) | Remote (this skill) |
-| --- | --- | --- |
-| Reason prefs | Sync → External Control Bus A | MIDI → Add manually (control surface) |
-| Cable | `loopMIDI Port` | Port 1 (in) + Port 2 (out) |
-| Deck profile | Reason - Fury | Reason - Remote |
-| Feedback | No | Yes (when values change / remap) |
+| | Fury Bus | Remote demo | Fury Remote |
+| --- | --- | --- | --- |
+| Reason prefs | Sync → External Control Bus A | MIDI → control surface | Same Community surface |
+| Cable | `loopMIDI Port` | Port 1 in / Port 2 out | Port 1 in / Port 2 out |
+| Deck profile | Reason - Fury | Reason - Remote | Reason - Fury Remote |
+| Feedback | No | Yes | Yes |
+| Scope / CCs | Fury `midi_cc_chart` | Combinator etc. / 20–23 | `Local Developer` / `com.local.Fury` / 40–68 |
 
 Never assign the same virtual port as both Remote In and Remote Out.
+
+### Fury Remote notes
+
+- Export: `reason-streamdeck-remote/Fury.remoteinfo.txt`
+- CC table: `reason-streamdeck-remote/fury-remote-cc-map.md`
+- Codec item `max` must match discrete remotables when Deck uses Fixed steps (not always 127).
+- Continuous remotables are often `0–4194304`; Remote scales from codec `0–127`.
 
 ## Symptom → fix
 
@@ -115,6 +123,8 @@ Never assign the same virtual port as both Remote In and Remote Out.
 | MIDI acts twice / jumps | Easy MIDI still enabled on Port 1/2 | Uncheck Easy MIDI for those ports |
 | No feedback to Deck | Out port unset, same In/Out port, or Deck In wrong | Out=Port 2; Deck `smi`=Port 2, `smo`=Port 1 |
 | Deck profile missing | Separate issue | See [streamdeck-profiles](../streamdeck-profiles/SKILL.md) |
+| *"Control surface inactivated"* / did not respond properly | Invalid auto_output expression (e.g. `bitand`/`bitshift`) | Use `bit.band(value,127)` / `bit.rshift(value,7)` for Pitch Bend; reinstall codec; full restart |
+| Surface OK but no Fury mapping | Wrong Scope manufacturer/model | Export Device Remote Info; Fury is `Local Developer` / `com.local.Fury` |
 
 ## Repo pointers
 
@@ -123,7 +133,9 @@ Never assign the same virtual port as both Remote In and Remote Out.
 | [`reason-streamdeck-remote/install-remote.ps1`](../../../reason-streamdeck-remote/install-remote.ps1) | Install codec+map to ProgramData + AppData |
 | [`reason-streamdeck-remote/Codecs/Lua Codecs/Community/`](../../../reason-streamdeck-remote/Codecs/Lua%20Codecs/Community/) | `.luacodec` / `.lua` / `.png` |
 | [`reason-streamdeck-remote/Maps/Community/`](../../../reason-streamdeck-remote/Maps/Community/) | `Community Stream Deck+ Remote.remotemap` |
-| [`reason-streamdeck-remote/build-remote-profile.ps1`](../../../reason-streamdeck-remote/build-remote-profile.ps1) | Companion Stream Deck profile |
-| [`reason-streamdeck-remote/install-streamdeck-profile.ps1`](../../../reason-streamdeck-remote/install-streamdeck-profile.ps1) | Install Deck profile |
+| [`reason-streamdeck-remote/build-remote-profile.ps1`](../../../reason-streamdeck-remote/build-remote-profile.ps1) | Demo Deck profile (Reason - Remote) |
+| [`reason-streamdeck-remote/build-fury-remote-profile.ps1`](../../../reason-streamdeck-remote/build-fury-remote-profile.ps1) | Fury Maximize Deck profile (Reason - Fury Remote) |
+| [`reason-streamdeck-remote/install-streamdeck-profile.ps1`](../../../reason-streamdeck-remote/install-streamdeck-profile.ps1) | Install Deck profile (`-ProfileName` / `-SourceRelative`) |
+| [`reason-streamdeck-remote/fury-remote-cc-map.md`](../../../reason-streamdeck-remote/fury-remote-cc-map.md) | Fury codec CC ↔ page |
 | [`reason-streamdeck-remote/README.md`](../../../reason-streamdeck-remote/README.md) | User-facing install steps |
 | [streamdeck-profiles skill](../streamdeck-profiles/SKILL.md) | Deck-side `.sdProfile` invariants |

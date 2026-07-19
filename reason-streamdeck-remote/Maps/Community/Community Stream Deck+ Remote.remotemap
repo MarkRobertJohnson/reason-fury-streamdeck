@@ -44,3 +44,39 @@ Map	Knob 1		Channel 1 Level
 Map	Knob 2		Channel 2 Level
 Map	Knob 3		Channel 3 Level
 Map	Knob 4		Channel 4 Level
+
+Scope	Local Developer	com.local.Fury
+//	Control Surface Item	Key	Remotable Item	Scale	Mode
+Map	Volume		Volume
+Map	Glide		Glide
+Map	Bend Range		Bend Range
+Map	Mono Mode		Mono Mode
+Map	Sub Level		Sub Level
+Map	Detune		Detune
+Map	Reese		Reese
+Map	FM Amount		FM Amount
+Map	Osc Shape		Osc Shape
+Map	Growl		Growl
+Map	Vowel		Vowel
+Map	Bite		Bite
+Map	Cutoff		Cutoff
+Map	Resonance		Resonance
+Map	Wobble Rate		Wobble Rate
+Map	Synced Rate		Synced Rate
+Map	Wobble Depth		Wobble Depth
+Map	Sync Mode		Sync Mode
+Map	Wobble Shape		Wobble Shape
+Map	Shape Pre		Shape Pre
+Map	Drive		Drive
+Map	Fold		Fold
+Map	Crush		Crush
+Map	Width		Width
+Map	Limiter		Limiter
+Map	Punch Amount		Punch Amount
+Map	Punch Decay		Punch Decay
+Map	Amp Attack		Amp Attack
+Map	Amp Release		Amp Release
+Map	Mod Wheel		Mod Wheel
+Map	Pitch Bend		Pitch Bend
+Map	Button 3		Select Previous Patch
+Map	Button 4		Select Next Patch

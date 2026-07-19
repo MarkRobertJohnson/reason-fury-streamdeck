@@ -43,7 +43,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\install-profile.ps1 -Resta
 | [`.agents/skills/reason-remote/`](.agents/skills/reason-remote/) | Agent skill for Reason/Recon Remote codec + remotemap install |
 | `package-streamdeck.ps1` | Build release zip |
 | `build-profile.ps1` | Rebuild from local Stream Deck templates (maintainers); `-KnobLayout Maximize` or `Compact` |
-| [`reason-streamdeck-remote/`](reason-streamdeck-remote/) | **Separate** Reason Remote surface (dual-port MIDI feedback). Uses `loopMIDI Port 1`/`2` — not `loopMIDI Port`. See that folder’s README. |
+| [`reason-streamdeck-remote/`](reason-streamdeck-remote/) | **Separate** Reason Remote surface (dual-port MIDI feedback). Profiles: **Reason - Remote** (demo) and **Reason - Fury Remote** (two-way Fury). Uses `loopMIDI Port 1`/`2` — not `loopMIDI Port`. See that folder’s README. |
 
 ## Pages
 
@@ -71,6 +71,8 @@ Nav keys use a dark icon with the page number upper-left and the section title c
 ## Why External Control Bus?
 
 Easy MIDI and a generic Remote "MIDI Control Keyboard" will play notes but will **not** auto-apply Fury's CC chart. External Bus A → Advanced MIDI channel 1 delivers CCs to the device chart.
+
+For **two-way** Fury control (Deck dials follow Reason), use the Community Remote surface and Stream Deck profile **Reason - Fury Remote** under [`reason-streamdeck-remote/`](reason-streamdeck-remote/) — that path does **not** use External Bus or the chart CCs above.
 
 ## Maintainer: package a release
 

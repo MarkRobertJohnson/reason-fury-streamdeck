@@ -36,16 +36,17 @@ flowchart LR
 | **Remote** (Preferences → MIDI → control surfaces) | In Port 1 / Out Port 2 | Yes (change-driven) | `reason-streamdeck-remote/` |
 | **External Control Bus** (Sync prefs → Bus A) | `loopMIDI Port` only | No | Reason-Fury profile |
 
-Fury’s CC chart on External Bus is **one-way**. It does **not** use Remote codecs or remotemaps.
+Fury’s CC chart on External Bus is **one-way**. Two-way Fury uses the same Community Remote codec with Scope `Local Developer` / `com.local.Fury` and Deck profile **Reason - Fury Remote** (codec CCs 40–68 — not the External Bus chart).
 
 ## Prefer existing scripts
 
 | Side | Script |
 | --- | --- |
 | Reason codec + map | `reason-streamdeck-remote/install-remote.ps1` |
-| Stream Deck profile | `reason-streamdeck-remote/build-remote-profile.ps1` + `install-streamdeck-profile.ps1` |
+| Stream Deck demo | `build-remote-profile.ps1` + `install-streamdeck-profile.ps1` |
+| Stream Deck Fury Remote | `build-fury-remote-profile.ps1` + `install-streamdeck-profile.ps1 -ProfileName 'Reason - Fury Remote' -SourceRelative 'StreamDeck\Reason-Fury-Remote.sdProfile'` |
 
-`build-remote-profile.ps1` alone does **not** register a manufacturer in Reason.
+`build-*-profile.ps1` alone does **not** register a manufacturer in Reason.
 
 ## Hard invariants
 
@@ -76,13 +77,20 @@ This project’s surface:
 3. Preferences → MIDI → Add manually → Community → Stream Deck+ Remote.
 4. Input: `loopMIDI Port 1` · Output: `loopMIDI Port 2`.
 5. Uncheck Easy MIDI for Port 1 and Port 2.
-6. Install/select Stream Deck profile **Reason - Remote** (see streamdeck-profiles skill).
+6. Install/select Stream Deck profile **Reason - Remote** (demo) or **Reason - Fury Remote** (see streamdeck-profiles skill).
+
+### Fury two-way
+
+1. Remotables: [`Fury.remoteinfo.txt`](../../../reason-streamdeck-remote/Fury.remoteinfo.txt) — Scope `Local Developer` / `com.local.Fury`.
+2. Codec items share remotable names; CCs in [`fury-remote-cc-map.md`](../../../reason-streamdeck-remote/fury-remote-cc-map.md) (40+). Discrete items use matching `max` (Osc Shape 3, Synced Rate 10, toggles 1).
+3. Remotemap Scope block already present; reinstall codec/map after edits.
+4. Deck profile: `build-fury-remote-profile.ps1` then install with `-ProfileName 'Reason - Fury Remote'`.
 
 ### Extend mappings
 
 1. Select a device in the rack → **File → Export Device Remote Info**.
-2. Add a `Scope\tPropellerheads\t<Device Name>` block (or RE manufacturer/scope from the export).
-3. Add `Map\tKnob N\t\t<Remotable Item>` lines (tabs).
+2. Add a `Scope\tPropellerheads\t<Device Name>` block (or RE manufacturer/scope from the export — Fury is `Local Developer` / `com.local.Fury`).
+3. Add `Map\t<item>\t\t<Remotable Item>` lines (tabs); item names must exist in the Lua codec.
 4. Re-run `install-remote.ps1` and restart the app.
 
 ### Debug order (ports/OK disabled or control surface error)
@@ -94,6 +102,7 @@ This project’s surface:
 5. Fully restart Reason/Recon.
 6. Preferences → Info on control surface error for the report string.
 7. Recon ASSERT in `MIDIUtils.cpp` on feedback → knob auto_outputs must use `x="value"` when items have `min=0, max=127` (not `127*value`).
+8. **"Control surface inactivated"** / did not respond properly → Lua auto_output formula error (common: Pitch Bend). Use `bit.band` / `bit.rshift` (Mackie style), not `bitand` / `bitshift`. Fully restart Recon after fixing.
 
 ## More detail
 

@@ -12,13 +12,19 @@
   "Remote Mapping file cannot be found" and disables port selectors / OK.
 
 .PARAMETER AlsoInstallProfile
-  Also build and install the companion Stream Deck profile.
+  Also build and install companion Stream Deck profile(s).
+
+.PARAMETER Profile
+  Which Deck profile(s) when -AlsoInstallProfile: Demo (Reason - Remote),
+  Fury (Reason - Fury Remote), or Both. Default: Demo.
 
 .PARAMETER RestartStreamDeck
   When used with -AlsoInstallProfile, restart the Stream Deck app after install.
 #>
 param(
   [switch]$AlsoInstallProfile,
+  [ValidateSet('Demo', 'Fury', 'Both')]
+  [string]$Profile = 'Demo',
   [switch]$RestartStreamDeck
 )
 
@@ -67,10 +73,32 @@ Write-Host "  5. Output Port: loopMIDI Port 2"
 Write-Host "  6. Disable Easy MIDI on Port 1 / Port 2 (avoid double-handling)."
 
 if ($AlsoInstallProfile) {
-  $build = Join-Path $Root 'build-remote-profile.ps1'
   $installSd = Join-Path $Root 'install-streamdeck-profile.ps1'
-  & $build
-  $sdArgs = @()
-  if ($RestartStreamDeck) { $sdArgs += '-Restart' }
-  & $installSd @sdArgs
+  $jobs = @()
+  if ($Profile -eq 'Demo' -or $Profile -eq 'Both') {
+    $jobs += @{
+      Build  = (Join-Path $Root 'build-remote-profile.ps1')
+      Name   = 'Reason - Remote'
+      Source = 'StreamDeck\Reason-Remote.sdProfile'
+    }
+  }
+  if ($Profile -eq 'Fury' -or $Profile -eq 'Both') {
+    $jobs += @{
+      Build  = (Join-Path $Root 'build-fury-remote-profile.ps1')
+      Name   = 'Reason - Fury Remote'
+      Source = 'StreamDeck\Reason-Fury-Remote.sdProfile'
+    }
+  }
+  for ($i = 0; $i -lt $jobs.Count; $i++) {
+    $job = $jobs[$i]
+    & $job.Build
+    $sdArgs = @{
+      ProfileName    = $job.Name
+      SourceRelative = $job.Source
+    }
+    if ($RestartStreamDeck -and $i -eq ($jobs.Count - 1)) {
+      $sdArgs.Restart = $true
+    }
+    & $installSd @sdArgs
+  }
 }

@@ -1,0 +1,43 @@
+Scope
+Manufacturer	Model
+Local Developer	com.local.Fury
+
+Remotable	Min	Max	Input type	Output type
+Volume	0	4194304	Value	ValueOutput
+Glide	0	4194304	Value	ValueOutput
+Bend Range	0	4194304	Value	ValueOutput
+Mono Mode	0	1	Toggle	ValueOutput
+Osc Shape	0	3	Value	ValueOutput
+Sub Level	0	4194304	Value	ValueOutput
+Detune	0	4194304	Value	ValueOutput
+Reese	0	4194304	Value	ValueOutput
+FM Amount	0	4194304	Value	ValueOutput
+Growl	0	4194304	Value	ValueOutput
+Vowel	0	4194304	Value	ValueOutput
+Bite	0	4194304	Value	ValueOutput
+Cutoff	0	4194304	Value	ValueOutput
+Resonance	0	4194304	Value	ValueOutput
+Wobble Rate	0	4194304	Value	ValueOutput
+Synced Rate	0	10	Value	ValueOutput
+Wobble Depth	0	4194304	Value	ValueOutput
+Wobble Shape	0	3	Value	ValueOutput
+Sync Mode	0	1	Toggle	ValueOutput
+Shape Pre	0	4194304	Value	ValueOutput
+Drive	0	4194304	Value	ValueOutput
+Fold	0	4194304	Value	ValueOutput
+Crush	0	4194304	Value	ValueOutput
+Width	0	4194304	Value	ValueOutput
+Limiter	0	4194304	Value	ValueOutput
+Punch Amount	0	4194304	Value	ValueOutput
+Punch Decay	0	4194304	Value	ValueOutput
+Amp Attack	0	4194304	Value	ValueOutput
+Amp Release	0	4194304	Value	ValueOutput
+Scope	0	1	Toggle	ValueOutput
+Spectrum	0	1	Toggle	ValueOutput
+Mod Wheel	0	127	Value	ValueOutput
+Pitch Bend	-8192	8191	Value	ValueOutput
+Device Name	0	0	-	TextOutput
+Patch Name	0	0	-	TextOutput
+Select Patch Delta	0	0	Delta	TextOutput
+Select Previous Patch	0	0	Trig	TextOutput
+Select Next Patch	0	0	Trig	TextOutput
