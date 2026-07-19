@@ -3,7 +3,16 @@
 .SYNOPSIS
   Build Reason-Fury.sdProfile from local Stream Deck Multi Midi / dial / note templates.
   Seven control pages with keypad nav (Go to Page) + Notes folder (openchild).
+
+.PARAMETER KnobLayout
+  Maximize (default): spread params across all four encoders; dual Multi when needed.
+  Compact: pack related params into fewer knobs (4-way Multi + singleton).
 #>
+param(
+  [ValidateSet('Maximize', 'Compact')]
+  [string]$KnobLayout = 'Maximize'
+)
+
 $ErrorActionPreference = 'Stop'
 
 $OutRoot = Join-Path $PSScriptRoot 'Reason-Fury.sdProfile'
@@ -347,6 +356,7 @@ function New-NotesFolderControllers {
 }
 
 # --- Define control pages (encoders only first) ---
+Write-Host "KnobLayout: $KnobLayout"
 $pageDefs = @()
 
 $pageDefs += New-EncoderPage 'Core' @{
@@ -356,47 +366,92 @@ $pageDefs += New-EncoderPage 'Core' @{
   '3,0' = New-DialAction 'Mode' 24
 }
 
-$pageDefs += New-EncoderPage 'Oscillator' @{
-  '0,0' = New-MultiAction @(
-    @{ Name = 'Sub'; CC = 26 }
-    @{ Name = 'Detune'; CC = 27 }
-    @{ Name = 'Reese'; CC = 28 }
-    @{ Name = 'FM'; CC = 29 }
-  ) 4
-  '1,0' = New-FixedShapeDial 'Shape' 25
-}
+if ($KnobLayout -eq 'Maximize') {
+  $pageDefs += New-EncoderPage 'Oscillator' @{
+    '0,0' = New-MultiAction @(
+      @{ Name = 'Sub'; CC = 26 }
+      @{ Name = 'Detune'; CC = 27 }
+    ) 2
+    '1,0' = New-DialAction 'Reese' 28
+    '2,0' = New-DialAction 'FM' 29
+    '3,0' = New-FixedShapeDial 'Shape' 25
+  }
 
-$pageDefs += New-EncoderPage 'Growl' @{
-  '0,0' = New-MultiAction @(
-    @{ Name = 'Growl'; CC = 12 }
-    @{ Name = 'Vowel'; CC = 17 }
-    @{ Name = 'Bite'; CC = 18 }
-    @{ Name = 'Cutoff'; CC = 74 }
-  ) 4
-  '1,0' = New-DialAction 'Res' 71
-}
+  $pageDefs += New-EncoderPage 'Growl' @{
+    '0,0' = New-MultiAction @(
+      @{ Name = 'Growl'; CC = 12 }
+      @{ Name = 'Vowel'; CC = 17 }
+    ) 2
+    '1,0' = New-DialAction 'Bite' 18
+    '2,0' = New-DialAction 'Cutoff' 74
+    '3,0' = New-DialAction 'Res' 71
+  }
 
-$pageDefs += New-EncoderPage 'Motion' @{
-  '0,0' = New-MultiAction @(
-    @{ Name = 'Rate'; CC = 13 }
-    @{ Name = 'SyncRate'; CC = 14 }
-    @{ Name = 'Depth'; CC = 16 }
-    @{ Name = 'SyncMode'; CC = 31 }
-  ) 4
-  '1,0' = New-FixedShapeDial 'Shape' 30
-}
+  $pageDefs += New-EncoderPage 'Motion' @{
+    '0,0' = New-MultiAction @(
+      @{ Name = 'Rate'; CC = 13 }
+      @{ Name = 'SyncRate'; CC = 14 }
+    ) 2
+    '1,0' = New-DialAction 'Depth' 16
+    '2,0' = New-DialAction 'SyncMode' 31
+    '3,0' = New-FixedShapeDial 'Shape' 30
+  }
 
-$pageDefs += New-EncoderPage 'Output' @{
-  '0,0' = New-MultiAction @(
-    @{ Name = 'ShapePre'; CC = 36 }
-    @{ Name = 'Drive'; CC = 19 }
-    @{ Name = 'Fold'; CC = 20 }
-    @{ Name = 'Crush'; CC = 21 }
-  ) 4
-  '1,0' = New-MultiAction @(
-    @{ Name = 'Width'; CC = 22 }
-    @{ Name = 'Limiter'; CC = 23 }
-  ) 2
+  $pageDefs += New-EncoderPage 'Output' @{
+    '0,0' = New-MultiAction @(
+      @{ Name = 'ShapePre'; CC = 36 }
+      @{ Name = 'Drive'; CC = 19 }
+    ) 2
+    '1,0' = New-DialAction 'Fold' 20
+    '2,0' = New-DialAction 'Crush' 21
+    '3,0' = New-MultiAction @(
+      @{ Name = 'Width'; CC = 22 }
+      @{ Name = 'Limiter'; CC = 23 }
+    ) 2
+  }
+} else {
+  $pageDefs += New-EncoderPage 'Oscillator' @{
+    '0,0' = New-MultiAction @(
+      @{ Name = 'Sub'; CC = 26 }
+      @{ Name = 'Detune'; CC = 27 }
+      @{ Name = 'Reese'; CC = 28 }
+      @{ Name = 'FM'; CC = 29 }
+    ) 4
+    '1,0' = New-FixedShapeDial 'Shape' 25
+  }
+
+  $pageDefs += New-EncoderPage 'Growl' @{
+    '0,0' = New-MultiAction @(
+      @{ Name = 'Growl'; CC = 12 }
+      @{ Name = 'Vowel'; CC = 17 }
+      @{ Name = 'Bite'; CC = 18 }
+      @{ Name = 'Cutoff'; CC = 74 }
+    ) 4
+    '1,0' = New-DialAction 'Res' 71
+  }
+
+  $pageDefs += New-EncoderPage 'Motion' @{
+    '0,0' = New-MultiAction @(
+      @{ Name = 'Rate'; CC = 13 }
+      @{ Name = 'SyncRate'; CC = 14 }
+      @{ Name = 'Depth'; CC = 16 }
+      @{ Name = 'SyncMode'; CC = 31 }
+    ) 4
+    '1,0' = New-FixedShapeDial 'Shape' 30
+  }
+
+  $pageDefs += New-EncoderPage 'Output' @{
+    '0,0' = New-MultiAction @(
+      @{ Name = 'ShapePre'; CC = 36 }
+      @{ Name = 'Drive'; CC = 19 }
+      @{ Name = 'Fold'; CC = 20 }
+      @{ Name = 'Crush'; CC = 21 }
+    ) 4
+    '1,0' = New-MultiAction @(
+      @{ Name = 'Width'; CC = 22 }
+      @{ Name = 'Limiter'; CC = 23 }
+    ) 2
+  }
 }
 
 $pageDefs += New-EncoderPage 'Articulation' @{

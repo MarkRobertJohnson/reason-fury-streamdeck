@@ -1,21 +1,21 @@
 ﻿{
-    "AppIdentifier":  "",
+    "AppIdentifier":  "D:\\Program Files\\Propellerhead\\Reason 13\\Reason.exe",
     "Device":  {
                    "Model":  "20GBD9901",
-                   "UUID":  ""
+                   "UUID":  "@(1)[4057/132/A00WA5241M38AB]"
                },
     "Name":  "Reason - Fury",
     "Pages":  {
-                  "Current":  "15aeef15-bff9-4e05-b380-db83efbc0dce",
-                  "Default":  "333652ee-d842-4327-8503-966b7be1de0f",
+                  "Current":  "0e6fdc96-3f9b-4d69-94a5-23051afa9d33",
+                  "Default":  "0f8183a4-19f0-4c38-8ea0-40ab4f0b7592",
                   "Pages":  [
-                                "15aeef15-bff9-4e05-b380-db83efbc0dce",
-                                "64b5c55b-6270-449a-b19d-d0ca669fa19b",
-                                "d816730a-fe6d-4621-95e7-42d0ea995da4",
-                                "fcc33a7f-3c45-4216-beef-629646bb0cf8",
-                                "f79cbda6-89c6-4ba0-a252-fdc3308021c9",
-                                "4ad52ae0-187a-4337-8d7b-10b5af86c676",
-                                "9b91e229-8a2b-437c-b3dc-e07ca117feef"
+                                "0e6fdc96-3f9b-4d69-94a5-23051afa9d33",
+                                "0439b974-0737-4d02-adc5-581cebd2cc0a",
+                                "a709c7c8-60a5-425c-960b-4d489e91c121",
+                                "6f9df97f-fc31-4fb8-a760-1960d443d5f8",
+                                "4a20f92e-d9b2-42e4-8f53-9ff913cffbc1",
+                                "ee820ca7-f280-4d38-b3ad-31816445a570",
+                                "15a6608d-6fc4-4709-b891-00ee7ff84eb3"
                             ]
               },
     "Version":  "3.0"

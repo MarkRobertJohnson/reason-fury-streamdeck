@@ -13,8 +13,10 @@ Fury's built-in MIDI CC chart is the source of truth. Install this profile, rout
 5. Run:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\install-profile.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\install-profile.ps1 -Restart
 ```
+
+`-Restart` stops and relaunches Stream Deck so the new profile is picked up. Omit it if you prefer to restart manually.
 
 6. In Stream Deck, select the **Reason - Fury** profile.
 7. In Reason / Recon:
@@ -33,23 +35,25 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\install-profile.ps1
 | Path | Purpose |
 | --- | --- |
 | `Reason-Fury.sdProfile/` | Portable profile (plugin paths use `__TREVLIGA_PLUGIN__`; expanded on install) |
-| `install-profile.ps1` | Install into `%APPDATA%\Elgato\StreamDeck\ProfilesV3` |
+| `install-profile.ps1` | Install into `%APPDATA%\Elgato\StreamDeck\ProfilesV3`; optional `-Restart` |
 | `midi-cc-map.md` | CC ↔ parameter table |
 | `verify-profile.ps1` | Check page labels/CCs |
 | `package-streamdeck.ps1` | Build release zip |
-| `build-profile.ps1` | Rebuild from local Stream Deck templates (maintainers) |
+| `build-profile.ps1` | Rebuild from local Stream Deck templates (maintainers); `-KnobLayout Maximize` or `Compact` |
 
 ## Pages
 
-| Page | Encoders |
+| Page | Encoders (Maximize layout, default) |
 | --- | --- |
 | Core | Volume 7, Glide 5, Bend 15, Mode 24 |
-| Oscillator | Sub/Detune/Reese/FM (Multi) + fixed Shape CC25 |
-| Growl | Growl/Vowel/Bite/Cutoff (Multi) + Res 71 |
-| Motion | Rate/SyncRate/Depth/SyncMode (Multi) + fixed Shape CC30 |
-| Output | ShapePre/Drive/Fold/Crush (Multi) + Width/Limiter (Multi) |
+| Oscillator | Sub/Detune (Multi), Reese 28, FM 29, fixed Shape 25 |
+| Growl | Growl/Vowel (Multi), Bite 18, Cutoff 74, Res 71 |
+| Motion | Rate/SyncRate (Multi), Depth 16, SyncMode 31, fixed Shape 30 |
+| Output | ShapePre/Drive (Multi), Fold 20, Crush 21, Width/Limiter (Multi) |
 | Articulation | Punch 37, Decay 33, Attack 35, Release 34 |
 | Performance | Pitch bend + Mod wheel (CC1) |
+
+Pages with more than four parameters use dual Multi knobs so all four encoders stay assigned. Rebuild with `-KnobLayout Compact` for the older packed maps (4-way Multi + singleton).
 
 Keypad on every control page:
 

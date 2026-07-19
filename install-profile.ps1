@@ -4,7 +4,14 @@
   Install Reason-Fury.sdProfile into Stream Deck ProfilesV3.
   Expands portable __TREVLIGA_PLUGIN__ tokens and rewrites absolute
   Trevliga Spel plugin paths to this machine's AppData plugin folder.
+
+.PARAMETER Restart
+  Stop Stream Deck after install, then start it again so the new profile is picked up.
 #>
+param(
+  [switch]$Restart
+)
+
 $ErrorActionPreference = 'Stop'
 
 $Source = Join-Path $PSScriptRoot 'Reason-Fury.sdProfile'
@@ -43,6 +50,47 @@ function Repair-ProfileMidiPaths([string]$profileDir) {
   }
 }
 
+function Get-StreamDeckExe {
+  $running = Get-Process -Name 'StreamDeck' -ErrorAction SilentlyContinue |
+    Where-Object { $_.Path } |
+    Select-Object -First 1
+  if ($running -and (Test-Path $running.Path)) {
+    return $running.Path
+  }
+  foreach ($candidate in @(
+    (Join-Path ${env:ProgramFiles} 'Elgato\StreamDeck\StreamDeck.exe'),
+    (Join-Path ${env:ProgramFiles(x86)} 'Elgato\StreamDeck\StreamDeck.exe')
+  )) {
+    if ($candidate -and (Test-Path $candidate)) { return $candidate }
+  }
+  return $null
+}
+
+function Restart-StreamDeck {
+  $exe = Get-StreamDeckExe
+  if (-not $exe) {
+    Write-Warning 'Stream Deck.exe not found; installed profile but could not restart the app.'
+    return
+  }
+
+  $procs = @(Get-Process -Name 'StreamDeck' -ErrorAction SilentlyContinue)
+  if ($procs.Count -gt 0) {
+    Write-Host "Stopping Stream Deck ($($procs.Count) process(es))..."
+    $procs | Stop-Process -Force
+    $deadline = (Get-Date).AddSeconds(15)
+    while ((Get-Date) -lt $deadline) {
+      $left = @(Get-Process -Name 'StreamDeck' -ErrorAction SilentlyContinue)
+      if ($left.Count -eq 0) { break }
+      Start-Sleep -Milliseconds 200
+    }
+  } else {
+    Write-Host 'Stream Deck was not running.'
+  }
+
+  Write-Host "Starting Stream Deck: $exe"
+  Start-Process -FilePath $exe
+}
+
 # Remove any previous Reason - Fury installs
 Get-ChildItem $ProfilesV3 -Directory -Filter '*.sdProfile' | ForEach-Object {
   $m = Join-Path $_.FullName 'manifest.json'
@@ -63,4 +111,9 @@ Repair-ProfileMidiPaths $dest
 
 Write-Host "Installed: $dest"
 Write-Host "Profile name: Reason - Fury"
-Write-Host "Restart Stream Deck (or switch profiles) if it does not appear immediately."
+
+if ($Restart) {
+  Restart-StreamDeck
+} else {
+  Write-Host "Restart Stream Deck (or run with -Restart) if it does not appear immediately."
+}

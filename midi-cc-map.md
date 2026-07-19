@@ -47,13 +47,13 @@ Every Fury instance responds to these CCs when they arrive on the **device** via
 
 The `Reason - Fury` Stream Deck+ profile maps these CCs by UI group:
 
-| Page | Controls |
+| Page | Controls (Maximize layout) |
 | --- | --- |
 | Core | Volume 7, Glide 5, Bend 15, Mode 24 |
-| Oscillator | Sub 26, Detune 27, Reese 28, FM 29; fixed Shape 25 |
-| Growl | Growl 12, Vowel 17, Bite 18, Cutoff 74, Res 71 |
-| Motion | Rate 13, SyncRate 14, Depth 16, SyncMode 31; fixed Shape 30 |
-| Output | ShapePre 36, Drive 19, Fold 20, Crush 21, Width 22, Limiter 23 |
+| Oscillator | Sub/Detune (Multi 26/27), Reese 28, FM 29, fixed Shape 25 |
+| Growl | Growl/Vowel (Multi 12/17), Bite 18, Cutoff 74, Res 71 |
+| Motion | Rate/SyncRate (Multi 13/14), Depth 16, SyncMode 31, fixed Shape 30 |
+| Output | ShapePre/Drive (Multi 36/19), Fold 20, Crush 21, Width/Limiter (Multi 22/23) |
 | Articulation | Punch 37, Decay 33, Attack 35, Release 34 |
 | Performance | Pitch bend (PB); Mod wheel CC1 |
 

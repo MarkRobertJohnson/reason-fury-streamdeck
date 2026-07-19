@@ -2,48 +2,26 @@
 <#
 .SYNOPSIS
   Verify Reason-Fury.sdProfile CC/label mappings and keypad navigation.
+
+.PARAMETER KnobLayout
+  Maximize (default) or Compact — must match how the profile was built.
 #>
+param(
+  [ValidateSet('Maximize', 'Compact')]
+  [string]$KnobLayout = 'Maximize'
+)
+
 $ErrorActionPreference = 'Stop'
 
 $ProfileRoot = Join-Path $PSScriptRoot 'Reason-Fury.sdProfile'
 if (-not (Test-Path $ProfileRoot)) { throw "Missing $ProfileRoot" }
 
-$Expected = @{
+$ExpectedShared = @{
   'Core' = @(
     @{ Pos = '0,0'; Kind = 'dial'; Name = 'Volume'; CC = 7 }
     @{ Pos = '1,0'; Kind = 'dial'; Name = 'Glide'; CC = 5 }
     @{ Pos = '2,0'; Kind = 'dial'; Name = 'Bend'; CC = 15 }
     @{ Pos = '3,0'; Kind = 'dial'; Name = 'Mode'; CC = 24 }
-  )
-  'Oscillator' = @(
-    @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
-      @{ Name = 'Sub'; CC = 26 }, @{ Name = 'Detune'; CC = 27 },
-      @{ Name = 'Reese'; CC = 28 }, @{ Name = 'FM'; CC = 29 }
-    )}
-    @{ Pos = '1,0'; Kind = 'fixed'; Name = 'Shape'; CC = 25 }
-  )
-  'Growl' = @(
-    @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
-      @{ Name = 'Growl'; CC = 12 }, @{ Name = 'Vowel'; CC = 17 },
-      @{ Name = 'Bite'; CC = 18 }, @{ Name = 'Cutoff'; CC = 74 }
-    )}
-    @{ Pos = '1,0'; Kind = 'dial'; Name = 'Res'; CC = 71 }
-  )
-  'Motion' = @(
-    @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
-      @{ Name = 'Rate'; CC = 13 }, @{ Name = 'SyncRate'; CC = 14 },
-      @{ Name = 'Depth'; CC = 16 }, @{ Name = 'SyncMode'; CC = 31 }
-    )}
-    @{ Pos = '1,0'; Kind = 'fixed'; Name = 'Shape'; CC = 30 }
-  )
-  'Output' = @(
-    @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
-      @{ Name = 'ShapePre'; CC = 36 }, @{ Name = 'Drive'; CC = 19 },
-      @{ Name = 'Fold'; CC = 20 }, @{ Name = 'Crush'; CC = 21 }
-    )}
-    @{ Pos = '1,0'; Kind = 'multi'; Slots = @(
-      @{ Name = 'Width'; CC = 22 }, @{ Name = 'Limiter'; CC = 23 }
-    )}
   )
   'Articulation' = @(
     @{ Pos = '0,0'; Kind = 'dial'; Name = 'Punch'; CC = 37 }
@@ -56,6 +34,82 @@ $Expected = @{
     @{ Pos = '1,0'; Kind = 'dial'; Name = 'Mod'; CC = 1 }
   )
 }
+
+if ($KnobLayout -eq 'Maximize') {
+  $ExpectedLayout = @{
+    'Oscillator' = @(
+      @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
+        @{ Name = 'Sub'; CC = 26 }, @{ Name = 'Detune'; CC = 27 }
+      )}
+      @{ Pos = '1,0'; Kind = 'dial'; Name = 'Reese'; CC = 28 }
+      @{ Pos = '2,0'; Kind = 'dial'; Name = 'FM'; CC = 29 }
+      @{ Pos = '3,0'; Kind = 'fixed'; Name = 'Shape'; CC = 25 }
+    )
+    'Growl' = @(
+      @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
+        @{ Name = 'Growl'; CC = 12 }, @{ Name = 'Vowel'; CC = 17 }
+      )}
+      @{ Pos = '1,0'; Kind = 'dial'; Name = 'Bite'; CC = 18 }
+      @{ Pos = '2,0'; Kind = 'dial'; Name = 'Cutoff'; CC = 74 }
+      @{ Pos = '3,0'; Kind = 'dial'; Name = 'Res'; CC = 71 }
+    )
+    'Motion' = @(
+      @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
+        @{ Name = 'Rate'; CC = 13 }, @{ Name = 'SyncRate'; CC = 14 }
+      )}
+      @{ Pos = '1,0'; Kind = 'dial'; Name = 'Depth'; CC = 16 }
+      @{ Pos = '2,0'; Kind = 'dial'; Name = 'SyncMode'; CC = 31 }
+      @{ Pos = '3,0'; Kind = 'fixed'; Name = 'Shape'; CC = 30 }
+    )
+    'Output' = @(
+      @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
+        @{ Name = 'ShapePre'; CC = 36 }, @{ Name = 'Drive'; CC = 19 }
+      )}
+      @{ Pos = '1,0'; Kind = 'dial'; Name = 'Fold'; CC = 20 }
+      @{ Pos = '2,0'; Kind = 'dial'; Name = 'Crush'; CC = 21 }
+      @{ Pos = '3,0'; Kind = 'multi'; Slots = @(
+        @{ Name = 'Width'; CC = 22 }, @{ Name = 'Limiter'; CC = 23 }
+      )}
+    )
+  }
+} else {
+  $ExpectedLayout = @{
+    'Oscillator' = @(
+      @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
+        @{ Name = 'Sub'; CC = 26 }, @{ Name = 'Detune'; CC = 27 },
+        @{ Name = 'Reese'; CC = 28 }, @{ Name = 'FM'; CC = 29 }
+      )}
+      @{ Pos = '1,0'; Kind = 'fixed'; Name = 'Shape'; CC = 25 }
+    )
+    'Growl' = @(
+      @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
+        @{ Name = 'Growl'; CC = 12 }, @{ Name = 'Vowel'; CC = 17 },
+        @{ Name = 'Bite'; CC = 18 }, @{ Name = 'Cutoff'; CC = 74 }
+      )}
+      @{ Pos = '1,0'; Kind = 'dial'; Name = 'Res'; CC = 71 }
+    )
+    'Motion' = @(
+      @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
+        @{ Name = 'Rate'; CC = 13 }, @{ Name = 'SyncRate'; CC = 14 },
+        @{ Name = 'Depth'; CC = 16 }, @{ Name = 'SyncMode'; CC = 31 }
+      )}
+      @{ Pos = '1,0'; Kind = 'fixed'; Name = 'Shape'; CC = 30 }
+    )
+    'Output' = @(
+      @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
+        @{ Name = 'ShapePre'; CC = 36 }, @{ Name = 'Drive'; CC = 19 },
+        @{ Name = 'Fold'; CC = 20 }, @{ Name = 'Crush'; CC = 21 }
+      )}
+      @{ Pos = '1,0'; Kind = 'multi'; Slots = @(
+        @{ Name = 'Width'; CC = 22 }, @{ Name = 'Limiter'; CC = 23 }
+      )}
+    )
+  }
+}
+
+$Expected = @{}
+foreach ($k in $ExpectedShared.Keys) { $Expected[$k] = $ExpectedShared[$k] }
+foreach ($k in $ExpectedLayout.Keys) { $Expected[$k] = $ExpectedLayout[$k] }
 
 $NavExpected = @(
   @{ Pos = '0,0'; Title = 'Core'; PageIndex = 1 }
@@ -212,5 +266,5 @@ if ($errors.Count) {
   exit 1
 }
 
-Write-Host "VERIFY OK - CC mappings and keypad navigation match plan"
+Write-Host "VERIFY OK - KnobLayout=$KnobLayout; CC mappings and keypad navigation match plan"
 exit 0
