@@ -105,9 +105,11 @@ In the **Stream Deck** app, select **Reason - Fury Remote** (or **Reason - Remot
 
 **Demo:** select a Combinator; turn Rotary 1 in Reason — Deck Knob 1 should move.
 
-**Fury:** select a Fury instance; turn Cutoff on the device — Deck Growl page Cutoff should follow. Turn Deck Volume — Fury Volume moves.
+**Fury:** select a Fury instance (or drag one in). Within about a second, Deck dials should jump to match the patch (scope-enable dump) — you should not need to touch Fury first. Turn Cutoff on the device — Deck follows. Turn Deck Volume — Fury follows.
 
-If the Deck does not update until you touch it, select/lock the device again (Reason often pushes feedback on remap).
+**Soft takeover:** if a Deck dial is still stale, turning it will not yank Fury until the dial crosses the real value (then it tracks normally).
+
+Background Stream Deck pages may still look stale until you open them if the MIDI plugin only paints the active page; the dump still updates plugin state for navigation.
 
 ## Extending maps
 
@@ -124,7 +126,7 @@ Map<TAB>Volume<TAB><TAB>Volume
 
 ## Agents / maintainers
 
-- Reason codec/map: [`.agents/skills/reason-remote`](../.agents/skills/reason-remote) (map filename, tabs, ProgramData+AppData, Easy MIDI, Recon restart).
+- Reason codec/map: [`.agents/skills/reason-remote`](../.agents/skills/reason-remote) — scaling playbook (export → Scope → CC block → dump + soft takeover), mistake log, install invariants.
 - Stream Deck companion profile: [`.agents/skills/streamdeck-profiles`](../.agents/skills/streamdeck-profiles) (page GUID UPPERCASE folders, Device.UUID, no UTF-8 BOM).
 
 After Deck profile install:
@@ -166,12 +168,15 @@ All three can be installed at once. Switch Stream Deck profiles depending on whi
 
 | Symptom | Fix |
 | --- | --- |
-| *"Control surface inactivated"* on Recon start | Codec Lua error — reinstall `install-remote.ps1` and fully restart. Pitch Bend outputs must use `bit.band` / `bit.rshift` (not `bitand` / `bitshift`). Check Preferences → red error icon for details. |
+| *"Control surface inactivated"* on Recon start | Codec Lua error — reinstall `install-remote.ps1` and fully restart. Common causes: bad Pitch Bend formulas (`bit.band`/`bit.rshift`, not `bitand`), or nil from `get_item_value` during feedback dump. Check Preferences → red error icon. |
 | No Fury mapping when Fury selected | Scope must be `Local Developer` / `com.local.Fury`; reinstall map + restart |
+| Deck dials stay at 0 after creating Fury | Codec should dump on scope enable — reinstall codec + full Recon restart. Confirm Remote Out = Port 2 and Deck In = Port 2. Select Fury again to re-trigger dump. |
+| First Deck turn used to yank Fury to 0 | Soft takeover should block until pickup; if not, codec is stale — reinstall + restart |
 
 ## Limitations
 
-- Not a full dump of patch state on demand
+- No Reason “dump all on demand” button — Fury sync is dump-on-scope-enable + change-driven auto_outputs
 - Background Stream Deck pages may not update until shown
 - Remotable names ≠ Fury External Bus CC numbers
 - Fury Scope/Spectrum/patch remotables not mapped in v1
+- Soft takeover applies to Fury CCs; Pitch Bend stays on auto-input (press encoder to center)

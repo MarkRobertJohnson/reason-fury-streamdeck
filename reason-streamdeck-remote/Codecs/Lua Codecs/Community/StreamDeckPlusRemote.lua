@@ -3,6 +3,83 @@
 -- Channel 1 (0-based nibble 0):
 --   Demo knobs CC 20-23, Buttons CC 30-33
 --   Fury params CC 40-68, Mod Wheel CC 1, Pitch Bend (e0)
+--
+-- Fury sync: dump all feedback CCs when Fury scope enables; soft-takeover
+-- on inbound Fury CCs so stale Deck dials cannot yank params to zero.
+
+g_fury_by_index = {}
+g_fury_cc_to_index = {}
+g_fury_volume_index = 0
+g_fury_scope_was_enabled = false
+g_fury_dirty = {}
+g_fury_last_sent = {}
+g_fury_last_physical = {}
+
+function fury_queue_index(index)
+  if g_fury_by_index[index] ~= nil then
+    g_fury_dirty[index] = true
+  end
+end
+
+function fury_queue_all()
+  for index, _ in pairs(g_fury_by_index) do
+    g_fury_dirty[index] = true
+  end
+end
+
+function fury_item_enabled(index)
+  -- Stock codecs treat this as boolean; be explicit for safety.
+  local en = remote.is_item_enabled(index)
+  return en == true or en == 1
+end
+
+function fury_get_value(index)
+  local value = remote.get_item_value(index)
+  if value == nil then
+    return nil
+  end
+  return value
+end
+
+function fury_make_feedback_midi(meta, value)
+  if value == nil then
+    return nil
+  end
+  if meta.kind == "pb" then
+    local v = math.floor(value)
+    if v < 0 then v = 0 end
+    if v > 16383 then v = 16383 end
+    local lo = math.floor(v % 128)
+    local hi = math.floor(v / 128)
+    return remote.make_midi(string.format("e0 %02x %02x", lo, hi))
+  end
+  local v = math.floor(value + 0.5)
+  if v < 0 then v = 0 end
+  if v > 127 then v = 127 end
+  return remote.make_midi(string.format("b0 %02x %02x", meta.cc, v))
+end
+
+-- Soft takeover: true when Deck value has crossed / matched Reason's value.
+function fury_pickup_allows(data_value, reason_value, last_physical, max_val)
+  if reason_value == nil then
+    return false
+  end
+  local band = 10
+  if max_val ~= nil and max_val <= 10 then
+    band = 0
+  end
+  if last_physical == nil or last_physical < 0 then
+    local diff = data_value - reason_value
+    if diff < 0 then diff = -diff end
+    return diff <= band
+  end
+  if last_physical < reason_value then
+    return data_value >= reason_value
+  elseif last_physical > reason_value then
+    return data_value <= reason_value
+  end
+  return true
+end
 
 function remote_init()
   local items =
@@ -17,7 +94,6 @@ function remote_init()
     {name="Button 3", input="button", output="value"},
     {name="Button 4", input="button", output="value"},
 
-    -- Fury (Local Developer / com.local.Fury) - item name = remotable name
     {name="Volume", input="value", output="value", min=0, max=127},
     {name="Glide", input="value", output="value", min=0, max=127},
     {name="Bend Range", input="value", output="value", min=0, max=127},
@@ -52,6 +128,69 @@ function remote_init()
   }
   remote.define_items(items)
 
+  -- Parallel tables: index order matches define_items (1-based). Fury starts at 9.
+  local fury_names =
+  {
+    "Volume", "Glide", "Bend Range", "Mono Mode",
+    "Sub Level", "Detune", "Reese", "FM Amount", "Osc Shape",
+    "Growl", "Vowel", "Bite", "Cutoff", "Resonance",
+    "Wobble Rate", "Synced Rate", "Wobble Depth", "Sync Mode", "Wobble Shape",
+    "Shape Pre", "Drive", "Fold", "Crush", "Width", "Limiter",
+    "Punch Amount", "Punch Decay", "Amp Attack", "Amp Release",
+    "Mod Wheel", "Pitch Bend",
+  }
+  local fury_ccs =
+  {
+    40, 41, 42, 43,
+    44, 45, 46, 47, 48,
+    49, 50, 51, 52, 53,
+    54, 55, 56, 57, 58,
+    59, 60, 61, 62, 63, 64,
+    65, 66, 67, 68,
+    1, -1,
+  }
+  local fury_max =
+  {
+    127, 127, 127, 1,
+    127, 127, 127, 127, 3,
+    127, 127, 127, 127, 127,
+    127, 10, 127, 1, 3,
+    127, 127, 127, 127, 127, 127,
+    127, 127, 127, 127,
+    127, 16383,
+  }
+
+  g_fury_by_index = {}
+  g_fury_cc_to_index = {}
+  g_fury_dirty = {}
+  g_fury_last_sent = {}
+  g_fury_last_physical = {}
+  g_fury_scope_was_enabled = false
+  g_fury_volume_index = 9
+
+  local i = 1
+  while i <= table.getn(fury_names) do
+    local index = 8 + i
+    local cc = fury_ccs[i]
+    local kind = "cc"
+    if cc < 0 then
+      kind = "pb"
+      cc = 0
+    end
+    g_fury_by_index[index] =
+    {
+      name = fury_names[i],
+      cc = cc,
+      kind = kind,
+      max = fury_max[i],
+    }
+    g_fury_last_physical[index] = -1
+    if kind == "cc" then
+      g_fury_cc_to_index[cc] = index
+    end
+    i = i + 1
+  end
+
   local inputs =
   {
     {pattern="b0 14 xx", name="Knob 1"},
@@ -64,7 +203,6 @@ function remote_init()
     {pattern="b0 20 xx", name="Button 3", value="x/127"},
     {pattern="b0 21 xx", name="Button 4", value="x/127"},
 
-    -- Fury CC 40-68 (0x28-0x44), Mod Wheel CC 1, Pitch Bend
     {pattern="b0 28 xx", name="Volume"},
     {pattern="b0 29 xx", name="Glide"},
     {pattern="b0 2a xx", name="Bend Range"},
@@ -101,8 +239,6 @@ function remote_init()
 
   local outputs =
   {
-    -- Items with min/max matching MIDI range: use x="value" (not 127*value).
-    -- 127*value overflows the data byte and trips Recon asserts (MIDIUtils.cpp).
     {name="Knob 1", pattern="b0 14 xx", x="value"},
     {name="Knob 2", pattern="b0 15 xx", x="value"},
     {name="Knob 3", pattern="b0 16 xx", x="value"},
@@ -143,13 +279,118 @@ function remote_init()
     {name="Amp Attack", pattern="b0 43 xx", x="value"},
     {name="Amp Release", pattern="b0 44 xx", x="value"},
     {name="Mod Wheel", pattern="b0 01 xx", x="value"},
-    -- Reason Remote expressions use Lua bit library (see Mackie codec), not bitand/bitshift.
     {name="Pitch Bend", pattern="e0 xx yy", x="bit.band(value,127)", y="bit.rshift(value,7)"},
   }
   remote.define_auto_outputs(outputs)
 end
 
--- No hardware identity; surface is added manually in Preferences.
+function remote_set_state(changed_items)
+  if changed_items == nil then
+    return
+  end
+
+  local enabled = false
+  if g_fury_volume_index > 0 and fury_item_enabled(g_fury_volume_index) then
+    enabled = true
+  end
+
+  if enabled and (g_fury_scope_was_enabled == false) then
+    fury_queue_all()
+    for index, _ in pairs(g_fury_by_index) do
+      g_fury_last_physical[index] = -1
+      g_fury_last_sent[index] = nil
+    end
+  end
+  g_fury_scope_was_enabled = enabled
+
+  if enabled == false then
+    return
+  end
+
+  local i = 1
+  while i <= table.getn(changed_items) do
+    fury_queue_index(changed_items[i])
+    i = i + 1
+  end
+end
+
+function remote_deliver_midi(maxbytes, port)
+  local events = {}
+  if port ~= nil and port ~= 1 then
+    return events
+  end
+
+  local used = 0
+  local budget = 1024
+  if maxbytes ~= nil then
+    budget = maxbytes
+  end
+
+  for index, meta in pairs(g_fury_by_index) do
+    if g_fury_dirty[index] then
+      g_fury_dirty[index] = nil
+      if fury_item_enabled(index) then
+        local value = fury_get_value(index)
+        if value ~= nil then
+          local last = g_fury_last_sent[index]
+          if last == nil or last ~= value then
+            local msg = fury_make_feedback_midi(meta, value)
+            if msg ~= nil then
+              local nbytes = 3
+              if used + nbytes <= budget then
+                table.insert(events, msg)
+                used = used + nbytes
+                g_fury_last_sent[index] = value
+              else
+                -- Keep dirty for next tick if buffer full.
+                g_fury_dirty[index] = true
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
+  return events
+end
+
+function remote_process_midi(event)
+  -- Soft takeover for Fury CCs (channel 1). Pitch Bend stays on auto-input.
+  -- Use raw bytes (Launchkey style) instead of yy match wildcards.
+  if event == nil then
+    return false
+  end
+  if event[1] ~= 176 then
+    return false
+  end
+
+  local cc = event[2]
+  local data = event[3]
+  local index = g_fury_cc_to_index[cc]
+  if index == nil then
+    return false
+  end
+
+  if fury_item_enabled(index) == false then
+    return true
+  end
+
+  local meta = g_fury_by_index[index]
+  local reason_value = fury_get_value(index)
+  local last_phys = g_fury_last_physical[index]
+  if last_phys == nil then
+    last_phys = -1
+  end
+
+  if fury_pickup_allows(data, reason_value, last_phys, meta.max) then
+    local msg = { time_stamp = event.time_stamp, item = index, value = data }
+    remote.handle_input(msg)
+  end
+  g_fury_last_physical[index] = data
+  return true
+end
+
 function remote_probe()
   local control_surfaces = {}
   return control_surfaces

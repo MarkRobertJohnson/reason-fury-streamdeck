@@ -2,10 +2,11 @@
 name: reason-remote
 description: >-
   Build, install, and debug Reason / Reason Recon Remote control surfaces
-  (luacodec, remotemap, ProgramData Remote, Easy MIDI, dual loopMIDI ports).
-  Use when editing reason-streamdeck-remote, installing codecs/maps, adding a
-  control surface in Preferences, fixing "Remote Mapping file cannot be found",
-  or contrasting Remote feedback with External Control Bus.
+  (luacodec, remotemap, scope-enable dump, soft takeover, ProgramData Remote,
+  Easy MIDI, dual loopMIDI ports). Use when editing reason-streamdeck-remote,
+  adding a new instrument Scope, implementing initial Deck sync / pickup,
+  installing codecs/maps, fixing "Remote Mapping file cannot be found" or
+  "Control surface inactivated", or contrasting Remote with External Control Bus.
 ---
 
 # Reason Remote
@@ -14,7 +15,7 @@ description: >-
 
 Before creating or installing any Remote codec/map:
 
-1. Re-read this skill.
+1. Re-read this skill and [reference.md](reference.md).
 2. Prefer [`reason-streamdeck-remote/install-remote.ps1`](../../../reason-streamdeck-remote/install-remote.ps1).
 3. Fully quit and restart **Reason or Reason Recon** after codec/map changes.
 4. For the Stream Deck companion profile half, also read [streamdeck-profiles](../streamdeck-profiles/SKILL.md).
@@ -33,10 +34,10 @@ flowchart LR
 
 | Path | Ports | Feedback | This repo |
 | --- | --- | --- | --- |
-| **Remote** (Preferences → MIDI → control surfaces) | In Port 1 / Out Port 2 | Yes (change-driven) | `reason-streamdeck-remote/` |
+| **Remote** (Preferences → MIDI → control surfaces) | In Port 1 / Out Port 2 | Yes (change-driven + our dump) | `reason-streamdeck-remote/` |
 | **External Control Bus** (Sync prefs → Bus A) | `loopMIDI Port` only | No | Reason-Fury profile |
 
-Fury’s CC chart on External Bus is **one-way**. Two-way Fury uses the same Community Remote codec with Scope `Local Developer` / `com.local.Fury` and Deck profile **Reason - Fury Remote** (codec CCs 40–68 — not the External Bus chart).
+Device CC charts on External Bus are **one-way** and use **different CC numbers** than the Remote Lua codec. Never reuse Bus chart CCs inside the codec without a dedicated map.
 
 ## Prefer existing scripts
 
@@ -56,17 +57,69 @@ Fury’s CC chart on External Bus is **one-way**. Two-way Fury uses the same Com
 | Map filename | `{Manufacturer} {Model}.remotemap` e.g. `Community Stream Deck+ Remote.remotemap` | "Remote Mapping file cannot be found"; ports/OK disabled |
 | Remotemap delimiters | **Tabs** everywhere (`Scope\tPropellerheads\tCombinator`) | Control surface error / map ignored |
 | Install roots | Both `%PROGRAMDATA%\Propellerhead Software\Remote` and `%APPDATA%\Propellerhead Software\Remote` | Codec or map not found after restart |
+| Optional Recon DefaultMaps | Keep in sync if a copy exists under Recon `Remote\DefaultMaps\<Manufacturer>\` | Stale Scope / missing maps in Logging builds |
 | Codec set | `.luacodec` + `.lua` + `.png` (about 96×96); manufacturer/model match map | Surface missing or broken |
 | Dual ports | Remote In = `loopMIDI Port 1`, Out = `loopMIDI Port 2` | Feedback loop if same port both ways |
 | Easy MIDI | Uncheck Port 1 and Port 2 when Remote owns them | Double-handling |
 | Restart | Fully quit Reason **or Recon** after install | Stale map; ports greyed until reload |
-| Recon | Same ProgramData Remote; error text may say "Reason Recon Remote Mapping" | Looking for a separate Recon-only map format |
+| Knob feedback scale | auto_output `x="value"` when item `min=0,max=127` | Recon ASSERT in `MIDIUtils.cpp` |
+| Pitch Bend formulas | `bit.band` / `bit.rshift` (Mackie style) | "Control surface inactivated" |
+| Manual feedback MIDI | Nil-guard `remote.get_item_value` before `math.floor` / `make_midi` | "Control surface inactivated" on startup |
 
 This project’s surface:
 
 - **Manufacturer:** `Community`
 - **Model:** `Stream Deck+ Remote`
 - **Map file:** `Community Stream Deck+ Remote.remotemap`
+- **Reference codec:** [`StreamDeckPlusRemote.lua`](../../../reason-streamdeck-remote/Codecs/Lua%20Codecs/Community/StreamDeckPlusRemote.lua)
+
+## Scaling: add another instrument (playbook)
+
+Use this order for every new device (stock or Rack Extension):
+
+1. **Export remotables** — select device → File → Export Device Remote Info. Commit the file (e.g. `reason-streamdeck-remote/<Device>.remoteinfo.txt`).
+2. **Record exact Scope** — manufacturer + model from the export header (REs are often `Local Developer` / `com.local.*`, not `Propellerheads`).
+3. **Extend the Lua codec** — one item per mapped remotable; **item name = remotable name**. Assign a **dedicated CC block** that does not collide with demo knobs (20–23), buttons (30–33), or other instrument blocks (Fury uses 40–68). Set item `max` to match discrete remotables when Deck uses Fixed steps.
+4. **Wire feedback safely** — keep `define_auto_outputs` with `x="value"` for continuous 0–127 items. For Pitch Bend use `bit.band` / `bit.rshift`, never `bitand` / `bitshift`.
+5. **Add initial sync** (required for Deck dials) — see [Initial sync pattern](#initial-sync-pattern-required) below. Copy the Fury helpers; rename the sentinel/index tables for the new device.
+6. **Add soft takeover** for that device’s inbound CCs — prevents stale dials from yanking params if dump is late or a page was hidden.
+7. **Extend the remotemap** — new `Scope\t…\t…` block; `Map\t<item>\t\t<Remotable>` (tabs).
+8. **Build a Deck profile** — dual ports (`smo=Port 1`, `smi=Port 2`), codec CCs only, streamdeck-profiles invariants.
+9. **Document** a small `*-remote-cc-map.md` and update the Remote README coexistence table.
+10. **Install + full Recon restart** — smoke-test create/select dump, Deck→device, device→Deck, soft takeover, and that other scopes still work.
+
+### Initial sync pattern (required)
+
+Reason has **no** “dump all parameters” API. `define_auto_outputs` only fires when values **change**, so create/select often leaves Stream Deck dials at 0 while the device is at real values — the next Deck turn then jumps the device.
+
+**Always implement both layers** for encoder-driven Deck surfaces:
+
+| Layer | Hooks | Behavior |
+| --- | --- | --- |
+| Scope-enable dump | `remote_set_state` + `remote_deliver_midi` | When a sentinel item for the Scope becomes enabled (`remote.is_item_enabled`), queue **all** that device’s items; emit `remote.make_midi` on the Remote Out port |
+| Soft takeover | `remote_process_midi` | For that device’s CCs, suppress `handle_input` until the Deck value crosses Reason’s value; return `true` so auto-input is skipped |
+
+Reference implementation: Fury helpers in [`StreamDeckPlusRemote.lua`](../../../reason-streamdeck-remote/Codecs/Lua%20Codecs/Community/StreamDeckPlusRemote.lua) (`fury_queue_*`, `remote_set_state`, `remote_deliver_midi`, `remote_process_midi`).
+
+**Safety rules learned the hard way:**
+
+- Nil-guard every `remote.get_item_value` before arithmetic or `make_midi` (nil → inactivated surface on startup).
+- Prefer raw status/CC/value bytes for pickup (`event[1]==176`) over exotic `match_midi` wildcards when possible.
+- Return an empty table `{}` from `remote_deliver_midi` when idle (not only `nil`).
+- Keep demo / other-scope items on `define_auto_inputs` / `define_auto_outputs`; only intercept the new device’s CC range in `remote_process_midi`.
+- Discrete params: codec `max` matches remotable (e.g. 3, 10, 1); pickup band `0` for those, `~10` for continuous 0–127.
+- Background Deck pages may look stale until shown; dump still updates MIDI plugin state for when the user navigates.
+
+```mermaid
+flowchart TD
+  select[Select_or_create_device] --> enabled[Sentinel_item_enabled]
+  enabled --> queue[Queue_all_scope_items]
+  queue --> deliver[remote_deliver_midi_make_midi]
+  deliver --> deckIn[Stream_Deck_MIDI_In]
+  deckTurn[Stale_Deck_turn] --> pickup{Crossed_Reason_value}
+  pickup -->|no| hold[Ignore_handle_input]
+  pickup -->|yes| apply[remote_handle_input]
+```
 
 ## Workflows
 
@@ -77,33 +130,26 @@ This project’s surface:
 3. Preferences → MIDI → Add manually → Community → Stream Deck+ Remote.
 4. Input: `loopMIDI Port 1` · Output: `loopMIDI Port 2`.
 5. Uncheck Easy MIDI for Port 1 and Port 2.
-6. Install/select Stream Deck profile **Reason - Remote** (demo) or **Reason - Fury Remote** (see streamdeck-profiles skill).
+6. Install/select the matching Stream Deck profile (see streamdeck-profiles skill).
 
-### Fury two-way
+### Fury two-way (canonical example)
 
 1. Remotables: [`Fury.remoteinfo.txt`](../../../reason-streamdeck-remote/Fury.remoteinfo.txt) — Scope `Local Developer` / `com.local.Fury`.
-2. Codec items share remotable names; CCs in [`fury-remote-cc-map.md`](../../../reason-streamdeck-remote/fury-remote-cc-map.md) (40+). Discrete items use matching `max` (Osc Shape 3, Synced Rate 10, toggles 1).
-3. Remotemap Scope block already present; reinstall codec/map after edits.
-4. Deck profile: `build-fury-remote-profile.ps1` then install with `-ProfileName 'Reason - Fury Remote'`.
+2. CCs: [`fury-remote-cc-map.md`](../../../reason-streamdeck-remote/fury-remote-cc-map.md) (40–68 + Mod/PB).
+3. Deck profile: **Reason - Fury Remote** via `build-fury-remote-profile.ps1`.
+4. Sync: scope-enable dump + soft takeover (see above).
 
-### Extend mappings
+### Debug order
 
-1. Select a device in the rack → **File → Export Device Remote Info**.
-2. Add a `Scope\tPropellerheads\t<Device Name>` block (or RE manufacturer/scope from the export — Fury is `Local Developer` / `com.local.Fury`).
-3. Add `Map\t<item>\t\t<Remotable Item>` lines (tabs); item names must exist in the Lua codec.
-4. Re-run `install-remote.ps1` and restart the app.
-
-### Debug order (ports/OK disabled or control surface error)
-
-1. Map filename is exactly `Community Stream Deck+ Remote.remotemap` (not model-only).
-2. Remotemap uses tabs (compare to stock `Scope\tPropellerheads\tMaster Keyboard`).
-3. Files exist under ProgramData **and** AppData `Remote\Codecs\Lua Codecs\Community` + `Remote\Maps\Community`.
+1. Map filename is exactly `Community Stream Deck+ Remote.remotemap`.
+2. Remotemap uses tabs.
+3. Files exist under ProgramData **and** AppData; refresh Recon `DefaultMaps` copy if present.
 4. Easy MIDI not claiming Port 1/2.
 5. Fully restart Reason/Recon.
-6. Preferences → Info on control surface error for the report string.
-7. Recon ASSERT in `MIDIUtils.cpp` on feedback → knob auto_outputs must use `x="value"` when items have `min=0, max=127` (not `127*value`).
-8. **"Control surface inactivated"** / did not respond properly → Lua auto_output formula error (common: Pitch Bend). Use `bit.band` / `bit.rshift` (Mackie style), not `bitand` / `bitshift`. Fully restart Recon after fixing.
+6. Preferences → red error icon / Info for the report string.
+7. ASSERT in `MIDIUtils.cpp` → knob auto_outputs must use `x="value"` for 0–127 items.
+8. **"Control surface inactivated"** → Lua error (PB formulas or nil arithmetic in dump path).
 
 ## More detail
 
-See [reference.md](reference.md).
+See [reference.md](reference.md) for formats, CC reservation, and mistake log.
