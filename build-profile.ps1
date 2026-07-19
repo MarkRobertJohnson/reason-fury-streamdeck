@@ -113,8 +113,11 @@ function Set-PitchBendDial($action, [string]$name) {
 function Set-FixedShapeDial($action, [string]$name, [int]$cc) {
   Set-Dial $action $name $cc
   $s = $action.Settings
+  # Fury shape selectors are 4-step enums; Advanced MIDI uses CC as step index.
   $s.a20 = 'Fixed'
-  $s.rcs = '32'
+  $s.rcs = '1'
+  $s.rcm = '0'
+  $s.rcx = '3'
   if ($null -ne $s.PSObject.Properties['rckf']) { $s.rckf = $true }
 }
 

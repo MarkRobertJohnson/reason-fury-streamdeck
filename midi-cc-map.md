@@ -50,11 +50,11 @@ The `Reason - Fury` Stream Deck+ profile maps these CCs by UI group:
 | Page | Controls (Maximize layout) |
 | --- | --- |
 | Core | Volume 7, Glide 5, Bend 15, Mode 24 |
-| Oscillator | Sub/Detune (Multi 26/27), Reese 28, FM 29, fixed Shape 25 |
+| Oscillator | Sub/Detune (Multi 26/27), Reese 28, FM 29, Shape 25 (Fixed steps 0–3: Saw/Square/Hybrid/Growl) |
 | Growl | Growl/Vowel (Multi 12/17), Bite 18, Cutoff 74, Res 71 |
-| Motion | Rate/SyncRate (Multi 13/14), Depth 16, SyncMode 31, fixed Shape 30 |
+| Motion | Rate/SyncRate (Multi 13/14), Depth 16, SyncMode 31, Shape 30 (Fixed steps 0–3: Sine/Triangle/Square/Ramp) |
 | Output | ShapePre/Drive (Multi 36/19), Fold 20, Crush 21, Width/Limiter (Multi 22/23) |
 | Articulation | Punch 37, Decay 33, Attack 35, Release 34 |
 | Performance | Pitch bend (PB); Mod wheel CC1 |
 
-Keypad on every control page: section jump buttons (Core/Osc/Growl/Motion/Out/Art/Perf) and a **Notes** folder (bass note pads; not a top-level swipe page).
+Shape dials use Fixed Min/Max `0–3` (step size 1) so each click is a selector index, not a 0–127 band. Keypad on every control page: section jump buttons (Core/Osc/Growl/Motion/Out/Art/Perf) and a **Notes** folder (bass note pads; not a top-level swipe page).

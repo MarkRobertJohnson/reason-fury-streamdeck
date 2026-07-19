@@ -46,14 +46,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\install-profile.ps1 -Resta
 | Page | Encoders (Maximize layout, default) |
 | --- | --- |
 | Core | Volume 7, Glide 5, Bend 15, Mode 24 |
-| Oscillator | Sub/Detune (Multi), Reese 28, FM 29, fixed Shape 25 |
+| Oscillator | Sub/Detune (Multi), Reese 28, FM 29, Shape 25 (Fixed 0–3) |
 | Growl | Growl/Vowel (Multi), Bite 18, Cutoff 74, Res 71 |
-| Motion | Rate/SyncRate (Multi), Depth 16, SyncMode 31, fixed Shape 30 |
+| Motion | Rate/SyncRate (Multi), Depth 16, SyncMode 31, Shape 30 (Fixed 0–3) |
 | Output | ShapePre/Drive (Multi), Fold 20, Crush 21, Width/Limiter (Multi) |
 | Articulation | Punch 37, Decay 33, Attack 35, Release 34 |
 | Performance | Pitch bend + Mod wheel (CC1) |
 
-Pages with more than four parameters use dual Multi knobs so all four encoders stay assigned. Rebuild with `-KnobLayout Compact` for the older packed maps (4-way Multi + singleton).
+Shape knobs send step indices `0–3` (Osc: Saw/Square/Hybrid/Growl; Motion: Sine/Triangle/Square/Ramp). Pages with more than four parameters use dual Multi knobs so all four encoders stay assigned. Rebuild with `-KnobLayout Compact` for the older packed maps (4-way Multi + singleton).
 
 Keypad on every control page:
 

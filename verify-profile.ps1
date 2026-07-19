@@ -192,8 +192,8 @@ foreach ($pageName in $Expected.Keys) {
       if ($s.rn1 -ne $exp.Name -or [int]$s.rcn -ne $exp.CC -or $s.rsa -ne 'CC') {
         $errors += "$pageName $($exp.Pos): expected fixed Shape $($exp.Name)/CC$($exp.CC), got $($s.rn1)/CC$($s.rcn)"
       }
-      if ($s.a20 -ne 'Fixed' -or [string]$s.rcs -ne '32') {
-        $errors += "$pageName $($exp.Pos): expected Fixed/rcs=32, got a20=$($s.a20) rcs=$($s.rcs)"
+      if ($s.a20 -ne 'Fixed' -or [string]$s.rcs -ne '1' -or [string]$s.rcm -ne '0' -or [string]$s.rcx -ne '3') {
+        $errors += "$pageName $($exp.Pos): expected Fixed rcs=1 rcm=0 rcx=3, got a20=$($s.a20) rcs=$($s.rcs) rcm=$($s.rcm) rcx=$($s.rcx)"
       }
     } elseif ($exp.Kind -eq 'pitch') {
       if ($s.rn1 -ne $exp.Name -or $s.rsa -ne 'PB') {
