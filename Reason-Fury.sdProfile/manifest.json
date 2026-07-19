@@ -1,0 +1,22 @@
+﻿{
+    "AppIdentifier":  "",
+    "Device":  {
+                   "Model":  "20GBD9901",
+                   "UUID":  ""
+               },
+    "Name":  "Reason - Fury",
+    "Pages":  {
+                  "Current":  "15aeef15-bff9-4e05-b380-db83efbc0dce",
+                  "Default":  "333652ee-d842-4327-8503-966b7be1de0f",
+                  "Pages":  [
+                                "15aeef15-bff9-4e05-b380-db83efbc0dce",
+                                "64b5c55b-6270-449a-b19d-d0ca669fa19b",
+                                "d816730a-fe6d-4621-95e7-42d0ea995da4",
+                                "fcc33a7f-3c45-4216-beef-629646bb0cf8",
+                                "f79cbda6-89c6-4ba0-a252-fdc3308021c9",
+                                "4ad52ae0-187a-4337-8d7b-10b5af86c676",
+                                "9b91e229-8a2b-437c-b3dc-e07ca117feef"
+                            ]
+              },
+    "Version":  "3.0"
+}
