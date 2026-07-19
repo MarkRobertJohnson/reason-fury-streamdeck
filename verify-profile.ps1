@@ -43,7 +43,7 @@ if ($KnobLayout -eq 'Maximize') {
       )}
       @{ Pos = '1,0'; Kind = 'dial'; Name = 'Reese'; CC = 28 }
       @{ Pos = '2,0'; Kind = 'dial'; Name = 'FM'; CC = 29 }
-      @{ Pos = '3,0'; Kind = 'fixed'; Name = 'Shape'; CC = 25 }
+      @{ Pos = '3,0'; Kind = 'fixed'; Name = 'Shape'; CC = 25; MaxStep = 3 }
     )
     'Growl' = @(
       @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
@@ -54,12 +54,12 @@ if ($KnobLayout -eq 'Maximize') {
       @{ Pos = '3,0'; Kind = 'dial'; Name = 'Res'; CC = 71 }
     )
     'Motion' = @(
-      @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
-        @{ Name = 'Rate'; CC = 13 }, @{ Name = 'SyncRate'; CC = 14 }
+      @{ Pos = '0,0'; Kind = 'dial'; Name = 'Free Rate'; CC = 13 }
+      @{ Pos = '1,0'; Kind = 'fixed'; Name = 'BPM Rate'; CC = 14; MaxStep = 10 }
+      @{ Pos = '2,0'; Kind = 'multi'; Slots = @(
+        @{ Name = 'Depth'; CC = 16 }, @{ Name = 'SyncMode'; CC = 31 }
       )}
-      @{ Pos = '1,0'; Kind = 'dial'; Name = 'Depth'; CC = 16 }
-      @{ Pos = '2,0'; Kind = 'dial'; Name = 'SyncMode'; CC = 31 }
-      @{ Pos = '3,0'; Kind = 'fixed'; Name = 'Shape'; CC = 30 }
+      @{ Pos = '3,0'; Kind = 'fixed'; Name = 'Shape'; CC = 30; MaxStep = 3 }
     )
     'Output' = @(
       @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
@@ -79,7 +79,7 @@ if ($KnobLayout -eq 'Maximize') {
         @{ Name = 'Sub'; CC = 26 }, @{ Name = 'Detune'; CC = 27 },
         @{ Name = 'Reese'; CC = 28 }, @{ Name = 'FM'; CC = 29 }
       )}
-      @{ Pos = '1,0'; Kind = 'fixed'; Name = 'Shape'; CC = 25 }
+      @{ Pos = '1,0'; Kind = 'fixed'; Name = 'Shape'; CC = 25; MaxStep = 3 }
     )
     'Growl' = @(
       @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
@@ -90,10 +90,11 @@ if ($KnobLayout -eq 'Maximize') {
     )
     'Motion' = @(
       @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
-        @{ Name = 'Rate'; CC = 13 }, @{ Name = 'SyncRate'; CC = 14 },
+        @{ Name = 'Free Rate'; CC = 13 },
+        @{ Name = 'BPM Rate'; CC = 14; FixedMax = 10 },
         @{ Name = 'Depth'; CC = 16 }, @{ Name = 'SyncMode'; CC = 31 }
       )}
-      @{ Pos = '1,0'; Kind = 'fixed'; Name = 'Shape'; CC = 30 }
+      @{ Pos = '1,0'; Kind = 'fixed'; Name = 'Shape'; CC = 30; MaxStep = 3 }
     )
     'Output' = @(
       @{ Pos = '0,0'; Kind = 'multi'; Slots = @(
@@ -189,11 +190,12 @@ foreach ($pageName in $Expected.Keys) {
         $errors += "$pageName $($exp.Pos): expected dial $($exp.Name)/CC$($exp.CC), got $($s.rn1)/CC$($s.rcn) rsa=$($s.rsa)"
       }
     } elseif ($exp.Kind -eq 'fixed') {
+      $maxStep = if ($null -ne $exp.MaxStep) { [string]$exp.MaxStep } else { '3' }
       if ($s.rn1 -ne $exp.Name -or [int]$s.rcn -ne $exp.CC -or $s.rsa -ne 'CC') {
-        $errors += "$pageName $($exp.Pos): expected fixed Shape $($exp.Name)/CC$($exp.CC), got $($s.rn1)/CC$($s.rcn)"
+        $errors += "$pageName $($exp.Pos): expected fixed $($exp.Name)/CC$($exp.CC), got $($s.rn1)/CC$($s.rcn)"
       }
-      if ($s.a20 -ne 'Fixed' -or [string]$s.rcs -ne '1' -or [string]$s.rcm -ne '0' -or [string]$s.rcx -ne '3') {
-        $errors += "$pageName $($exp.Pos): expected Fixed rcs=1 rcm=0 rcx=3, got a20=$($s.a20) rcs=$($s.rcs) rcm=$($s.rcm) rcx=$($s.rcx)"
+      if ($s.a20 -ne 'Fixed' -or [string]$s.rcs -ne '1' -or [string]$s.rcm -ne '0' -or [string]$s.rcx -ne $maxStep) {
+        $errors += "$pageName $($exp.Pos): expected Fixed rcs=1 rcm=0 rcx=$maxStep, got a20=$($s.a20) rcs=$($s.rcs) rcm=$($s.rcm) rcx=$($s.rcx)"
       }
     } elseif ($exp.Kind -eq 'pitch') {
       if ($s.rn1 -ne $exp.Name -or $s.rsa -ne 'PB') {
@@ -204,6 +206,13 @@ foreach ($pageName in $Expected.Keys) {
       foreach ($slot in $exp.Slots) {
         if ($s."rn$i" -ne $slot.Name -or [int]$s."rcn$i" -ne $slot.CC -or $s."rsa$i" -ne 'CC') {
           $errors += ("{0} {1} slot {2}: expected {3}/CC{4}, got {5}/CC{6}" -f $pageName, $exp.Pos, $i, $slot.Name, $slot.CC, $s."rn$i", $s."rcn$i")
+        }
+        if ($null -ne $slot.FixedMax) {
+          $fm = [string]$slot.FixedMax
+          if ($s."a20_$i" -ne 'Fixed' -or [string]$s."rcs$i" -ne '1' -or [string]$s."rcm$i" -ne '0' -or [string]$s."rcx$i" -ne $fm) {
+            $errors += ("{0} {1} slot {2}: expected Fixed rcs=1 rcm=0 rcx={3}, got a20={4} rcs={5} rcm={6} rcx={7}" -f `
+              $pageName, $exp.Pos, $i, $fm, $s."a20_$i", $s."rcs$i", $s."rcm$i", $s."rcx$i")
+          }
         }
         $i++
       }

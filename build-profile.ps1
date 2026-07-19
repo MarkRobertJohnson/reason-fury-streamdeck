@@ -68,6 +68,13 @@ function Set-MultiSlots($action, [object[]]$slots, [int]$sfa) {
       $s."of_t$i" = '0'
       $s."on_t$i" = '127'
       $s."ch_t$i" = '1'
+      # Optional FixedMax: discrete step selector (CC used as step index 0..FixedMax)
+      if ($null -ne $slot.FixedMax) {
+        $s."a20_$i" = 'Fixed'
+        $s."rcs$i" = '1'
+        $s."rcm$i" = '0'
+        $s."rcx$i" = [string]$slot.FixedMax
+      }
     } else {
       $s."rn$i" = ''
       $s."rcn$i" = '0'
@@ -110,15 +117,19 @@ function Set-PitchBendDial($action, [string]$name) {
   if ($null -ne $s.PSObject.Properties['rcx']) { $s.rcx = '16383' }
 }
 
-function Set-FixedShapeDial($action, [string]$name, [int]$cc) {
+function Set-FixedStepDial($action, [string]$name, [int]$cc, [int]$maxStep) {
   Set-Dial $action $name $cc
   $s = $action.Settings
-  # Fury shape selectors are 4-step enums; Advanced MIDI uses CC as step index.
+  # Discrete selectors: Advanced MIDI uses CC as step index 0..maxStep.
   $s.a20 = 'Fixed'
   $s.rcs = '1'
   $s.rcm = '0'
-  $s.rcx = '3'
+  $s.rcx = [string]$maxStep
   if ($null -ne $s.PSObject.Properties['rckf']) { $s.rckf = $true }
+}
+
+function Set-FixedShapeDial($action, [string]$name, [int]$cc) {
+  Set-FixedStepDial $action $name $cc 3
 }
 
 function New-EmptyControllers {
@@ -296,14 +307,18 @@ function New-DialAction([string]$name, [int]$cc) {
   return $a
 }
 
-function New-FixedShapeDial([string]$name, [int]$cc) {
+function New-FixedStepDial([string]$name, [int]$cc, [int]$maxStep) {
   $a = Get-DeepClone $dialProto
   $a.ActionID = (New-GuidLower)
-  Set-FixedShapeDial $a $name $cc
+  Set-FixedStepDial $a $name $cc $maxStep
   if ($a.States -and @($a.States).Count -gt 0) {
     $a.States[0] | Add-Member -NotePropertyName Title -NotePropertyValue $name -Force
   }
   return $a
+}
+
+function New-FixedShapeDial([string]$name, [int]$cc) {
+  New-FixedStepDial $name $cc 3
 }
 
 function New-PitchBendDial([string]$name) {
@@ -391,12 +406,12 @@ if ($KnobLayout -eq 'Maximize') {
   }
 
   $pageDefs += New-EncoderPage 'Motion' @{
-    '0,0' = New-MultiAction @(
-      @{ Name = 'Rate'; CC = 13 }
-      @{ Name = 'SyncRate'; CC = 14 }
+    '0,0' = New-DialAction 'Free Rate' 13
+    '1,0' = New-FixedStepDial 'BPM Rate' 14 10
+    '2,0' = New-MultiAction @(
+      @{ Name = 'Depth'; CC = 16 }
+      @{ Name = 'SyncMode'; CC = 31 }
     ) 2
-    '1,0' = New-DialAction 'Depth' 16
-    '2,0' = New-DialAction 'SyncMode' 31
     '3,0' = New-FixedShapeDial 'Shape' 30
   }
 
@@ -435,8 +450,8 @@ if ($KnobLayout -eq 'Maximize') {
 
   $pageDefs += New-EncoderPage 'Motion' @{
     '0,0' = New-MultiAction @(
-      @{ Name = 'Rate'; CC = 13 }
-      @{ Name = 'SyncRate'; CC = 14 }
+      @{ Name = 'Free Rate'; CC = 13 }
+      @{ Name = 'BPM Rate'; CC = 14; FixedMax = 10 }
       @{ Name = 'Depth'; CC = 16 }
       @{ Name = 'SyncMode'; CC = 31 }
     ) 4
