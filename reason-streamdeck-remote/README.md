@@ -12,7 +12,7 @@ This is **not** an official Elgato or Reason Studios product. It registers in Pr
 | Piece | Role |
 | --- | --- |
 | Lua codec + `.luacodec` | Defines 4 knobs + 4 buttons with CC in **and** CC out (feedback) |
-| `.remotemap` | Starter scopes: Combinator, SubTractor, NN-XT, Master Section, Mixer 14:2 |
+| `.remotemap` | Must be named `Community Stream Deck+ Remote.remotemap` (Manufacturer + Model). Scopes: Combinator, SubTractor, NN-XT, Master Section, Mixer 14:2 |
 | Companion Stream Deck profile | Trevliga Spel dials using **separate** In/Out ports |
 
 Feedback is **change / remap driven** (Reason pushes values when parameters change or the surface remaps). There is no on-demand “dump all values” button in Reason.
@@ -42,45 +42,52 @@ Never use one port for both In and Out (MIDI feedback loop).
 - Stream Deck+ and [Trevliga Spel MIDI](https://trevligaspel.se/streamdeck/midi/index.php)
 - `loopMIDI Port 1` and `loopMIDI Port 2` created in loopMIDI
 
-### 1. Install Remote codec + map
+There are **two** installs (do not skip the Reason one):
+
+| Step | Script | Where it shows up |
+| --- | --- | --- |
+| A. Reason Remote codec + map | `install-remote.ps1` | Preferences → MIDI → Add manually → Manufacturer **Community** |
+| B. Stream Deck companion profile | `build-remote-profile.ps1` + `install-streamdeck-profile.ps1` | Stream Deck app profile dropdown → **Reason - Remote** |
+
+`build-remote-profile.ps1` / `install-streamdeck-profile.ps1` alone will **not** add anything to Reason’s manufacturer list.
+
+Works with **Reason** and **Reason Recon** (same `%PROGRAMDATA%\Propellerhead Software\Remote\` folder).
+
+### 1. Install Remote codec + map (Reason / Recon)
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\install-remote.ps1
 ```
 
-Copies into `%PROGRAMDATA%\Propellerhead Software\Remote\`.
+**Fully quit and restart Reason Recon** after installing so codecs reload.
 
-**Restart Reason** after installing so the new surface appears.
-
-### 2. Add the surface in Reason
+### 2. Add the surface in Reason / Recon
 
 1. **Edit → Preferences → MIDI**
 2. Under **Remote keyboards and control surfaces**, click **Add manually**
-3. Manufacturer: **Community** · Model: **Stream Deck+ Remote**
-4. **Input Port:** `loopMIDI Port 1`
-5. **Output Port:** `loopMIDI Port 2` (required for feedback)
-6. In **Easy MIDI Inputs**, **uncheck** Port 1 and Port 2 so Remote owns them exclusively
+3. Manufacturer: **Community** (not “Stream Deck” / “Elgato”)
+4. Model: **Stream Deck+ Remote**
+5. **Input Port:** `loopMIDI Port 1`
+6. **Output Port:** `loopMIDI Port 2` (required for feedback)
+7. In **Easy MIDI Inputs**, **uncheck** Port 1 and Port 2 so Remote owns them exclusively
+8. If ports/OK stay disabled with **Remote Mapping file cannot be found**, re-run `install-remote.ps1` and **fully restart** Recon. The map filename must be exactly `Community Stream Deck+ Remote.remotemap` (tab-delimited inside).
 
 ### 3. Install companion Stream Deck profile
 
-`build-remote-profile.ps1` / `install-streamdeck-profile.ps1` stamp `Device.UUID` from an existing local profile (e.g. Default Profile or Reason - Fury). Stream Deck **hides** profiles that fail to load. Common failure modes we guard against:
-
-- empty `Device.UUID`
-- UTF-8 BOM on root `manifest.json`
-- lowercase on-disk page folder GUIDs (must be **UPPERCASE**; JSON page refs stay lowercase)
+Guards: Device.UUID, no UTF-8 BOM, UPPERCASE on-disk page folder GUIDs. See [`.agents/skills/streamdeck-profiles`](../.agents/skills/streamdeck-profiles).
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build-remote-profile.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\install-streamdeck-profile.ps1 -Restart
 ```
 
-Or one shot:
+Or both sides at once:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\install-remote.ps1 -AlsoInstallProfile -RestartStreamDeck
 ```
 
-In Stream Deck, select the **Reason - Remote** profile.
+In the **Stream Deck** app (not Reason), select profile **Reason - Remote**.
 
 ### 4. Prove feedback
 
@@ -110,7 +117,10 @@ Map<TAB>Knob 1<TAB><TAB>Filter Freq<TAB><TAB>Filters
 
 ## Agents / maintainers
 
-Before building or installing the companion Stream Deck profile, follow [`.agents/skills/streamdeck-profiles`](../.agents/skills/streamdeck-profiles) (page GUID UPPERCASE folders, Device.UUID, no UTF-8 BOM on root manifest). After install:
+- Reason codec/map: [`.agents/skills/reason-remote`](../.agents/skills/reason-remote) (map filename, tabs, ProgramData+AppData, Easy MIDI, Recon restart).
+- Stream Deck companion profile: [`.agents/skills/streamdeck-profiles`](../.agents/skills/streamdeck-profiles) (page GUID UPPERCASE folders, Device.UUID, no UTF-8 BOM).
+
+After Deck profile install:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File ..\verify-profile-load.ps1 -Name 'Reason - Remote'

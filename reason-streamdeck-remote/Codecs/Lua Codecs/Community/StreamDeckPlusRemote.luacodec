@@ -10,7 +10,7 @@ function remote_supported_control_surfaces()
       picture="StreamDeckPlusRemote.png",
       in_ports={{description="From Stream Deck (loopMIDI Port 1)"}},
       out_ports={{description="To Stream Deck (loopMIDI Port 2)"}},
-      setup_info_text="Virtual Remote surface for Elgato Stream Deck+ via Trevliga Spel MIDI. Use two separate loopMIDI ports: Port 1 = Deck Out → Reason In, Port 2 = Reason Out → Deck In. Do not share these ports with the Reason-Fury External Control Bus profile (loopMIDI Port).",
+      setup_info_text="Virtual Remote surface for Elgato Stream Deck+ via Trevliga Spel MIDI. Use two separate loopMIDI ports: Port 1 = Deck Out to Reason In, Port 2 = Reason Out to Deck In. Do not share these ports with the Reason-Fury External Control Bus profile (loopMIDI Port).",
       has_keyboard=false
     },
   }

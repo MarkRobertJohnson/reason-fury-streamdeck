@@ -47,6 +47,8 @@ function remote_init()
   remote.define_auto_outputs(outputs)
 end
 
+-- No hardware identity; surface is added manually in Preferences.
 function remote_probe()
-  return {}
+  local control_surfaces = {}
+  return control_surfaces
 end
