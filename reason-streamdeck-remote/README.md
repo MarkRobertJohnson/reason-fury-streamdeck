@@ -108,6 +108,14 @@ With a variation/mode column (empty Scale):
 Map<TAB>Knob 1<TAB><TAB>Filter Freq<TAB><TAB>Filters
 ```
 
+## Agents / maintainers
+
+Before building or installing the companion Stream Deck profile, follow [`.agents/skills/streamdeck-profiles`](../.agents/skills/streamdeck-profiles) (page GUID UPPERCASE folders, Device.UUID, no UTF-8 BOM on root manifest). After install:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ..\verify-profile-load.ps1 -Name 'Reason - Remote'
+```
+
 ## Layout in this folder
 
 ```text

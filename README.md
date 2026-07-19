@@ -38,6 +38,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\install-profile.ps1 -Resta
 | `install-profile.ps1` | Install into `%APPDATA%\Elgato\StreamDeck\ProfilesV3`; optional `-Restart` |
 | `midi-cc-map.md` | CC ↔ parameter table |
 | `verify-profile.ps1` | Check page labels/CCs |
+| `verify-profile-load.ps1` | Assert installed profile is loadable (BOM, UUID, UPPERCASE page folders) |
+| [`.agents/skills/streamdeck-profiles/`](.agents/skills/streamdeck-profiles/) | Agent skill for Stream Deck profile build/install invariants |
 | `package-streamdeck.ps1` | Build release zip |
 | `build-profile.ps1` | Rebuild from local Stream Deck templates (maintainers); `-KnobLayout Maximize` or `Compact` |
 | [`reason-streamdeck-remote/`](reason-streamdeck-remote/) | **Separate** Reason Remote surface (dual-port MIDI feedback). Uses `loopMIDI Port 1`/`2` — not `loopMIDI Port`. See that folder’s README. |
@@ -71,8 +73,11 @@ Easy MIDI and a generic Remote "MIDI Control Keyboard" will play notes but will 
 
 ## Maintainer: package a release
 
+Agents: use [`.agents/skills/streamdeck-profiles`](.agents/skills/streamdeck-profiles) before building or installing any `.sdProfile` (GUID casing, Device.UUID, no UTF-8 BOM).
+
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\verify-profile.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\verify-profile-load.ps1 -Name 'Reason - Fury'
 powershell -NoProfile -ExecutionPolicy Bypass -File .\package-streamdeck.ps1
 gh release create streamdeck-fury-v1.0.0 `
   -t "Stream Deck: Reason - Fury v1.0.0" `
