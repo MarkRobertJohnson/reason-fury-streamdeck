@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Package Fury Stream Deck zip
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\package-streamdeck.ps1
+
+      - name: Package Remote Surface zip
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\reason-streamdeck-remote\package-remote.ps1
+
+      - name: Compute date tag
+        id: tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          today=$(date -u +%Y.%m.%d)
+          # YYYY.MM.DD for the first release of the UTC day; then YYYY.MM.DD.2, .3, …
+          if ! git rev-parse -q --verify "refs/tags/$today" >/dev/null; then
+            tag="$today"
+          else
+            n=2
+            while git rev-parse -q --verify "refs/tags/${today}.${n}" >/dev/null; do
+              n=$((n + 1))
+            done
+            tag="${today}.${n}"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Using release tag: $tag"
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" \
+            --target "$GITHUB_SHA" \
+            --title "Release $TAG" \
+            --generate-notes \
+            --fail-on-no-commits \
+            "dist/Reason-Fury-StreamDeck.zip" \
+            "dist/Reason-StreamDeck-Remote.zip"

@@ -6,11 +6,19 @@ Fury's built-in MIDI CC chart is the source of truth. Install this profile, rout
 
 ## Download
 
-1. Get **Reason-Fury-StreamDeck.zip** from [Releases](https://github.com/MarkRobertJohnson/reason-fury-streamdeck/releases).
-2. Unzip.
-3. Install the [Trevliga Spel MIDI plugin](https://trevligaspel.se/streamdeck/midi/index.php) if needed.
-4. Create a virtual MIDI port named `loopMIDI Port`.
-5. Run:
+Each [Release](https://github.com/MarkRobertJohnson/reason-fury-streamdeck/releases) (date-tagged, e.g. `2026.07.19`) includes:
+
+| Asset | What it is |
+| --- | --- |
+| **Reason-Fury-StreamDeck.zip** | One-way External Bus Fury profile (this README) |
+| **Reason-StreamDeck-Remote.zip** | Reason Remote surface + companion Deck profiles — see [`reason-streamdeck-remote/README.md`](reason-streamdeck-remote/README.md) |
+
+### Reason - Fury (External Bus)
+
+1. Download **Reason-Fury-StreamDeck.zip** and unzip.
+2. Install the [Trevliga Spel MIDI plugin](https://trevligaspel.se/streamdeck/midi/index.php) if needed.
+3. Create a virtual MIDI port named `loopMIDI Port`.
+4. Run:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\install-profile.ps1 -Restart
@@ -18,8 +26,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\install-profile.ps1 -Resta
 
 `-Restart` stops and relaunches Stream Deck so the new profile is picked up. Omit it if you prefer to restart manually.
 
-6. In Stream Deck, select the **Reason - Fury** profile.
-7. In Reason / Recon:
+5. In Stream Deck, select the **Reason - Fury** profile.
+6. In Reason / Recon:
    - Preferences → Sync: **External Control Bus A** = `loopMIDI Port`
    - Hardware Interface → **ADVANCED MIDI** → Bus A, **Channel 1** → your Fury device
 
@@ -41,7 +49,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\install-profile.ps1 -Resta
 | `verify-profile-load.ps1` | Assert installed profile is loadable (BOM, UUID, UPPERCASE page folders) |
 | [`.agents/skills/streamdeck-profiles/`](.agents/skills/streamdeck-profiles/) | Agent skill for Stream Deck profile build/install invariants |
 | [`.agents/skills/reason-remote/`](.agents/skills/reason-remote/) | Agent skill for Reason/Recon Remote codec + remotemap install |
-| `package-streamdeck.ps1` | Build release zip |
+| `package-streamdeck.ps1` | Build `dist/Reason-Fury-StreamDeck.zip` |
+| `reason-streamdeck-remote/package-remote.ps1` | Build `dist/Reason-StreamDeck-Remote.zip` |
+| `.github/workflows/release.yml` | Auto-release both zips on push to `main` |
 | `build-profile.ps1` | Rebuild from local Stream Deck templates (maintainers); `-KnobLayout Maximize` or `Compact` |
 | [`reason-streamdeck-remote/`](reason-streamdeck-remote/) | **Separate** Reason Remote surface (dual-port MIDI feedback). Profiles: **Reason - Remote** (demo) and **Reason - Fury Remote** (two-way Fury). Uses `loopMIDI Port 1`/`2` — not `loopMIDI Port`. See that folder’s README. |
 
@@ -74,18 +84,23 @@ Easy MIDI and a generic Remote "MIDI Control Keyboard" will play notes but will 
 
 For **two-way** Fury control (Deck dials follow Reason), use the Community Remote surface and Stream Deck profile **Reason - Fury Remote** under [`reason-streamdeck-remote/`](reason-streamdeck-remote/) — that path does **not** use External Bus or the chart CCs above.
 
-## Maintainer: package a release
+## Maintainer: releases
+
+Pushes to `main` run [`.github/workflows/release.yml`](.github/workflows/release.yml): verify/package both zips, create a date tag (`YYYY.MM.DD`, then `.2`, `.3`, … same UTC day), and publish a GitHub Release with auto-generated notes (`gh release create --generate-notes`) plus both assets.
 
 Agents: use [`.agents/skills/streamdeck-profiles`](.agents/skills/streamdeck-profiles) before building or installing any `.sdProfile` (GUID casing, Device.UUID, no UTF-8 BOM). For Reason Remote codec/map work under `reason-streamdeck-remote/`, use [`.agents/skills/reason-remote`](.agents/skills/reason-remote).
 
+Manual / hotfix release:
+
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\verify-profile.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File .\verify-profile-load.ps1 -Name 'Reason - Fury'
 powershell -NoProfile -ExecutionPolicy Bypass -File .\package-streamdeck.ps1
-gh release create streamdeck-fury-v1.0.0 `
-  -t "Stream Deck: Reason - Fury v1.0.0" `
-  -n "Portable Stream Deck+ profile for Fury. See README." `
-  .\dist\Reason-Fury-StreamDeck.zip
+powershell -NoProfile -ExecutionPolicy Bypass -File .\reason-streamdeck-remote\package-remote.ps1
+gh release create 2026.07.19 `
+  -t "Release 2026.07.19" `
+  --generate-notes `
+  .\dist\Reason-Fury-StreamDeck.zip `
+  .\dist\Reason-StreamDeck-Remote.zip
 ```
 
 ## License

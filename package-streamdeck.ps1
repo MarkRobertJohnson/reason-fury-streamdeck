@@ -22,7 +22,9 @@ Write-Host "Verifying profile..."
 & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $ScriptDir 'verify-profile.ps1')
 if ($LASTEXITCODE -ne 0) { throw "verify-profile.ps1 failed" }
 
-if (Test-Path $DistRoot) { Remove-Item -Recurse -Force $DistRoot }
+# Only clear this package's stage/zip so sibling release zips in dist/ survive.
+if (Test-Path $StageDir) { Remove-Item -Recurse -Force $StageDir }
+if (Test-Path $ZipPath) { Remove-Item -Force $ZipPath }
 New-Item -ItemType Directory -Force -Path $StageDir | Out-Null
 
 $stagedProfile = Join-Path $StageDir 'Reason-Fury.sdProfile'

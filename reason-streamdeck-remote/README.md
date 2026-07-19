@@ -37,6 +37,10 @@ Never use one port for both In and Out (MIDI feedback loop).
 | Mod Wheel | 1 | Mod Wheel |
 | Pitch Bend | PB (e0) | Pitch Bend |
 
+## Download
+
+Get **Reason-StreamDeck-Remote.zip** from the repo [Releases](https://github.com/MarkRobertJohnson/reason-fury-streamdeck/releases) (same date-tagged release as the Fury External Bus zip). Unzip, then follow **Install** below from that folder.
+
 ## Install
 
 ### Prerequisites
@@ -146,6 +150,7 @@ reason-streamdeck-remote/
   build-remote-profile.ps1        # Reason - Remote demo profile
   build-fury-remote-profile.ps1   # Reason - Fury Remote Maximize profile
   install-streamdeck-profile.ps1  # install into ProfilesV3
+  package-remote.ps1              # build ../dist/Reason-StreamDeck-Remote.zip
   Codecs/Lua Codecs/Community/    # .luacodec .lua .png
   Maps/Community/                 # .remotemap
   StreamDeck/Reason-Remote.sdProfile/
