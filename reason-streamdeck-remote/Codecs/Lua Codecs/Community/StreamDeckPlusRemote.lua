@@ -14,11 +14,10 @@ g_fury_scope_was_enabled = false
 g_fury_dirty = {}
 g_fury_last_sent = {}
 g_fury_last_physical = {}
--- Once pickup succeeds, stay latched so fast Deck spins are not blocked by
--- lagging get_item_value (crossing-style pickup sticks when Reason lags).
+-- Once pickup succeeds after scope enable, stay latched for the session.
+-- Do not re-arm mid-session: settle/phys mismatch unlatch caused discrete
+-- Fixed-step dials (and occasional Ultra spins) to stick.
 g_fury_synced = {}
-g_fury_last_input_ms = {}
-g_fury_settle_ms = 150
 
 function fury_queue_index(index)
   if g_fury_by_index[index] ~= nil then
@@ -65,13 +64,15 @@ function fury_make_feedback_midi(meta, value)
 end
 
 function fury_pickup_band(max_val)
+  -- Discrete Fixed steps (max 1/3/10): allow adjacent step on first touch.
+  -- Exact band 0 made toggles unusable when Deck and Reason disagreed by 1.
   if max_val ~= nil and max_val <= 10 then
-    return 0
+    return 1
   end
   return 10
 end
 
--- Soft takeover until first lock: match within band, or cross Reason's value.
+-- Soft takeover until first lock after scope enable.
 -- After lock (g_fury_synced), callers must not use this — pass all CCs through.
 function fury_pickup_allows(data_value, reason_value, last_physical, max_val)
   if reason_value == nil then
@@ -183,7 +184,6 @@ function remote_init()
   g_fury_last_sent = {}
   g_fury_last_physical = {}
   g_fury_synced = {}
-  g_fury_last_input_ms = {}
   g_fury_scope_was_enabled = false
   g_fury_volume_index = 9
 
@@ -205,7 +205,6 @@ function remote_init()
     }
     g_fury_last_physical[index] = -1
     g_fury_synced[index] = false
-    g_fury_last_input_ms[index] = 0
     if kind == "cc" then
       g_fury_cc_to_index[cc] = index
     end
@@ -316,12 +315,12 @@ function remote_set_state(changed_items)
   end
 
   if enabled and (g_fury_scope_was_enabled == false) then
+    -- New Fury focus: dump feedback and re-arm pickup once for create/select sync.
     fury_queue_all()
     for index, _ in pairs(g_fury_by_index) do
       g_fury_last_physical[index] = -1
       g_fury_last_sent[index] = nil
       g_fury_synced[index] = false
-      g_fury_last_input_ms[index] = 0
     end
   end
   g_fury_scope_was_enabled = enabled
@@ -330,27 +329,9 @@ function remote_set_state(changed_items)
     return
   end
 
-  local now = remote.get_time_ms()
   local i = 1
   while i <= table.getn(changed_items) do
-    local item_index = changed_items[i]
-    fury_queue_index(item_index)
-    -- Re-arm pickup only for external Reason changes (not our own handle_input echo).
-    if g_fury_by_index[item_index] ~= nil and g_fury_synced[item_index] then
-      local elapsed = now - g_fury_last_input_ms[item_index]
-      if elapsed > g_fury_settle_ms then
-        local meta = g_fury_by_index[item_index]
-        local reason_value = fury_get_value(item_index)
-        local phys = g_fury_last_physical[item_index]
-        if reason_value ~= nil and phys ~= nil and phys >= 0 then
-          local diff = phys - reason_value
-          if diff < 0 then diff = -diff end
-          if diff > fury_pickup_band(meta.max) then
-            g_fury_synced[item_index] = false
-          end
-        end
-      end
-    end
+    fury_queue_index(changed_items[i])
     i = i + 1
   end
 end
@@ -424,10 +405,9 @@ function remote_process_midi(event)
     last_phys = -1
   end
 
-  -- Latched: pass every CC through (Stream Deck absolute bursts lag Reason otherwise).
+  -- Latched until next scope enable: pass every CC through.
   if g_fury_synced[index] then
     remote.handle_input({ time_stamp = event.time_stamp, item = index, value = data })
-    g_fury_last_input_ms[index] = remote.get_time_ms()
     g_fury_last_physical[index] = data
     return true
   end
@@ -435,7 +415,6 @@ function remote_process_midi(event)
   if fury_pickup_allows(data, reason_value, last_phys, meta.max) then
     remote.handle_input({ time_stamp = event.time_stamp, item = index, value = data })
     g_fury_synced[index] = true
-    g_fury_last_input_ms[index] = remote.get_time_ms()
   end
   g_fury_last_physical[index] = data
   return true

@@ -138,9 +138,9 @@ Keep `define_auto_outputs` for incremental change feedback; dump covers create/s
    - Else compare Deck `event[3]` to Reason value (band / cross); on success `handle_input` and **latch synced**.
    - Always update last-physical; return `true`.
 3. Leave other CCs to `define_auto_inputs` (return `false`).
-4. Re-arm synced=`false` on scope enable, and in `remote_set_state` when Reason moves without recent local input (settle ~150ms) and physical vs Reason diverge past band.
+4. Reset synced=`false` **only** when the Scope becomes enabled (create/select). Do not re-arm from `remote_set_state` settle/phys mismatch.
 
-Pickup band: ~10 for continuous 0–127; `0` when item `max <= 10`.
+Pickup band: ~10 for continuous 0–127; **1** when item `max <= 10` (adjacent Fixed step on first touch).
 
 ### Stream Deck half
 
@@ -169,7 +169,8 @@ Never assign the same virtual port as both Remote In and Remote Out.
 | auto_output `x="127*value"` on 0..127 knobs | Recon ASSERT `MIDIUtils.cpp` | `x="value"` |
 | Pitch Bend `bitand` / `bitshift` | Surface inactivated on launch | `bit.band` / `bit.rshift` |
 | Relying only on `define_auto_outputs` for create/select | Deck dials stay at 0; first turn yanks device | Scope-enable dump + soft takeover |
-| Crossing pickup on every CC (no latch) | Fast Deck spins stick — Reason value lags, next CCs blocked | Latch synced after first pickup; re-arm on scope enable / external change after settle |
+| Crossing pickup on every CC (no latch) | Fast Deck spins stick — Reason value lags, next CCs blocked | Latch synced after first pickup until next scope enable |
+| Settle re-arm + discrete band 0 | Fixed-step Mode/Shape/SyncMode stick after short pause | No mid-session re-arm; discrete first-touch band 1 |
 | `math.floor(remote.get_item_value(...))` without nil check | Surface inactivated on launch / select | Nil-guard; skip until value exists |
 | Reusing External Bus chart CCs in Remote codec | Wrong bindings; confusion with Bus profile | Separate CC block; document in `*-remote-cc-map.md` |
 | Guessing RE Scope as `Propellerheads <Name>` | No mapping when device focused | Export Device Remote Info |
