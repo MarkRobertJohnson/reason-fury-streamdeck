@@ -122,6 +122,8 @@ $NavExpected = @(
   @{ Pos = '2,1'; Title = 'Perf'; PageIndex = 7 }
 )
 
+$PageOrder = @('Core', 'Oscillator', 'Growl', 'Motion', 'Output', 'Articulation', 'Performance')
+
 $errors = @()
 $root = Get-Content (Join-Path $ProfileRoot 'manifest.json') -Raw | ConvertFrom-Json
 if ($root.Name -ne 'Reason - Fury') { $errors += "Root name is '$($root.Name)'" }
@@ -243,7 +245,17 @@ foreach ($pageName in $Expected.Keys) {
       $errors += "$pageName $($nav.Pos): missing States[0].Image for nav contrast icon"
     } elseif (-not (Test-Path (Join-Path $pageDir $img))) {
       $errors += "$pageName $($nav.Pos): Image file missing: $img"
+    } else {
+      $thisPageIndex = [array]::IndexOf($PageOrder, $pageName) + 1
+      if ($thisPageIndex -gt 0 -and $idx -eq $thisPageIndex -and $img -notmatch '\.gif$') {
+        $errors += "$pageName $($nav.Pos): expected animated .gif for current-page nav, got $img"
+      }
     }
+  }
+  if (-not $enc.Background) {
+    $errors += "$pageName Encoder missing Background (section strip)"
+  } elseif (-not (Test-Path (Join-Path $pageDir $enc.Background))) {
+    $errors += "$pageName Encoder.Background file missing: $($enc.Background)"
   }
   $folder = $pad.Actions.'3,1'
   if (-not $folder -or $folder.UUID -ne 'com.elgato.streamdeck.profile.openchild') {

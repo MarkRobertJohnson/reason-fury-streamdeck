@@ -1,4 +1,4 @@
-﻿{
+{
     "AppIdentifier":  "D:\\Program Files\\Propellerhead\\Reason 13\\Reason.exe",
     "Device":  {
                    "Model":  "20GBD9901",
@@ -6,16 +6,16 @@
                },
     "Name":  "Reason - Fury",
     "Pages":  {
-                  "Current":  "98de7bab-b822-404a-99d5-ea94c4a5788c",
-                  "Default":  "c474a011-719e-4e01-8ae1-d69aa5de1fc4",
+                  "Current":  "5c733d13-df07-4f08-b81e-82dab6c2f55a",
+                  "Default":  "4d760df6-c015-458a-9b28-90d0fcf870b6",
                   "Pages":  [
-                                "98de7bab-b822-404a-99d5-ea94c4a5788c",
-                                "a1324fa3-0276-4860-b081-82650ddfea99",
-                                "cde08dc3-0c08-431b-a249-80bbcb7064ec",
-                                "f6f654fd-2550-471e-9b11-e3de60fbead8",
-                                "d4a1ddd5-7099-492a-806e-df6550927c13",
-                                "ef2496d0-52f8-4c8b-9234-c5e042bc0ade",
-                                "357631c1-2434-4951-987a-aefb76889a6d"
+                                "5c733d13-df07-4f08-b81e-82dab6c2f55a",
+                                "55f57f20-8873-4fab-9f47-3dc9cafd2a96",
+                                "1025f527-4bef-499d-a14a-365a9decf6b9",
+                                "e321c157-e9ce-4a28-a950-5520ec1e0723",
+                                "43461919-884a-4c84-95b6-63b6dc782f96",
+                                "77f05d26-a31a-4908-9e08-dd838d27bcfd",
+                                "cde9a691-98c6-4bdb-bfbf-9650c622dcc1"
                             ]
               },
     "Version":  "3.0"

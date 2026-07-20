@@ -15,6 +15,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+. (Join-Path $PSScriptRoot 'scripts\StreamDeckSectionTheme.ps1')
+
 $OutRoot = Join-Path $PSScriptRoot 'Reason-Fury.sdProfile'
 $ProfilesV3 = Join-Path $env:APPDATA 'Elgato\StreamDeck\ProfilesV3'
 
@@ -146,6 +148,11 @@ function New-EmptyControllers {
   )
 }
 
+function Write-Utf8NoBom([string]$path, [string]$text) {
+  $utf8 = New-Object System.Text.UTF8Encoding $false
+  [System.IO.File]::WriteAllText($path, $text, $utf8)
+}
+
 function Write-PageManifest([string]$dir, [string]$name, $controllers) {
   New-Item -ItemType Directory -Force -Path $dir | Out-Null
   $page = [pscustomobject]@{
@@ -153,56 +160,7 @@ function Write-PageManifest([string]$dir, [string]$name, $controllers) {
     Icon = ''
     Name = $name
   }
-  $json = $page | ConvertTo-Json -Depth 100
-  Set-Content -Path (Join-Path $dir 'manifest.json') -Value $json -Encoding UTF8
-}
-
-function New-NavPageIcon([int]$pageIndex, [string]$outPath) {
-  Add-Type -AssemblyName System.Drawing -ErrorAction SilentlyContinue
-  $size = 144
-  $bmp = New-Object System.Drawing.Bitmap $size, $size
-  $g = [System.Drawing.Graphics]::FromImage($bmp)
-  $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
-  $g.TextRenderingHint = [System.Drawing.Text.TextRenderingHint]::ClearTypeGridFit
-  $g.Clear([System.Drawing.Color]::FromArgb(255, 28, 28, 30))
-  $font = New-Object System.Drawing.Font 'Segoe UI', 22, ([System.Drawing.FontStyle]::Bold)
-  $brush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 200, 200, 205))
-  $g.DrawString([string]$pageIndex, $font, $brush, 8.0, 4.0)
-  $dir = Split-Path -Parent $outPath
-  if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
-  $bmp.Save($outPath, [System.Drawing.Imaging.ImageFormat]::Png)
-  $g.Dispose()
-  $bmp.Dispose()
-  $font.Dispose()
-  $brush.Dispose()
-}
-
-function New-NavIconAssets([int]$pageCount) {
-  $dir = Join-Path $PSScriptRoot 'assets\nav'
-  New-Item -ItemType Directory -Force -Path $dir | Out-Null
-  for ($i = 1; $i -le $pageCount; $i++) {
-    New-NavPageIcon $i (Join-Path $dir "page-$i.png")
-  }
-  return $dir
-}
-
-function Install-NavImagesOnPage($controllers, [string]$pageDir, [string]$navIconDir) {
-  $imagesDir = Join-Path $pageDir 'Images'
-  New-Item -ItemType Directory -Force -Path $imagesDir | Out-Null
-  $pad = @($controllers | Where-Object { $_.Type -eq 'Keypad' })[0]
-  if (-not $pad -or -not $pad.Actions) { return }
-  $posToIndex = [ordered]@{
-    '0,0' = 1; '1,0' = 2; '2,0' = 3; '3,0' = 4
-    '0,1' = 5; '1,1' = 6; '2,1' = 7
-  }
-  foreach ($pos in $posToIndex.Keys) {
-    $act = $pad.Actions.$pos
-    if (-not $act -or $act.UUID -ne 'com.elgato.streamdeck.page.goto') { continue }
-    $idx = [int]$posToIndex[$pos]
-    $fileName = ([guid]::NewGuid().ToString('N').ToUpperInvariant()) + '.png'
-    Copy-Item -Force (Join-Path $navIconDir "page-$idx.png") (Join-Path $imagesDir $fileName)
-    $act.States[0] | Add-Member -NotePropertyName Image -NotePropertyValue ("Images/" + $fileName) -Force
-  }
+  Write-Utf8NoBom (Join-Path $dir 'manifest.json') ($page | ConvertTo-Json -Depth 100)
 }
 
 function New-GoToPageAction([string]$title, [int]$pageIndex) {
@@ -496,9 +454,9 @@ foreach ($pd in $pageDefs) {
   $pd.Controllers[0].Actions = New-NavKeypadActions $notesChildIds[$pd.Name]
 }
 
-# Dark nav icons: page number upper-left; section title stays centered on the key
-$navIconDir = New-NavIconAssets $sectionNames.Count
-Write-Host "Generated nav icons in $navIconDir"
+# Section-colored nav icons (active = animated GIF) + Encoder.Background strips
+$themeAssets = New-SectionThemeAssets (Join-Path $PSScriptRoot 'assets')
+Write-Host "Generated section theme assets in $($themeAssets.NavDir) / $($themeAssets.StripDir)"
 
 # Rebuild output tree
 if (Test-Path $OutRoot) { Remove-Item -Recurse -Force $OutRoot }
@@ -506,11 +464,14 @@ $profilesDir = Join-Path $OutRoot 'Profiles'
 New-Item -ItemType Directory -Force -Path $profilesDir | Out-Null
 
 $topLevelIds = @()
+$pageIndex = 0
 foreach ($pd in $pageDefs) {
+  $pageIndex++
   $id = $sectionIds[$pd.Name]
   $topLevelIds += $id
   $dir = Join-Path $profilesDir $id.ToUpperInvariant()
-  Install-NavImagesOnPage $pd.Controllers $dir $navIconDir
+  Install-NavImagesOnPage $pd.Controllers $dir $themeAssets.NavDir $pageIndex
+  Install-EncoderBackground $pd.Controllers $dir $themeAssets.StripDir $pageIndex
   Write-PageManifest $dir $pd.Name $pd.Controllers
   Write-Host "Wrote page $($pd.Name) -> $id"
 
@@ -536,8 +497,7 @@ $root = [pscustomobject]@{
   Version = '3.0'
 }
 
-$rootJson = $root | ConvertTo-Json -Depth 20
-Set-Content -Path (Join-Path $OutRoot 'manifest.json') -Value $rootJson -Encoding UTF8
+Write-Utf8NoBom (Join-Path $OutRoot 'manifest.json') ($root | ConvertTo-Json -Depth 20)
 
 Write-Host ""
 Write-Host "Built profile: $OutRoot"

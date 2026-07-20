@@ -33,7 +33,10 @@ jobs:
         run: |
           function Test-GitTag([string]$Name) {
             git rev-parse -q --verify "refs/tags/$Name" *> $null
-            return ($LASTEXITCODE -eq 0)
+            $exists = ($LASTEXITCODE -eq 0)
+            # Missing tags make git exit 1; clear so the step does not inherit it.
+            $global:LASTEXITCODE = 0
+            return $exists
           }
           $today = (Get-Date).ToUniversalTime().ToString('yyyy.MM.dd')
           if (-not (Test-GitTag $today)) {
@@ -45,6 +48,7 @@ jobs:
           }
           "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           Write-Host "Using release tag: $tag"
+          exit 0
 
       - name: Create GitHub Release
         env:
