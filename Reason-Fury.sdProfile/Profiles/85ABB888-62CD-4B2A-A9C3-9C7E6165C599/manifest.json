@@ -1,0 +1,701 @@
+{
+    "Controllers":  [
+                        {
+                            "Actions":  {
+                                            "0,0":  {
+                                                        "ActionID":  "f019dd73-04f7-4723-b052-5740dde9ee6a",
+                                                        "LinkedTitle":  true,
+                                                        "Name":  "Parent Folder",
+                                                        "Plugin":  {
+                                                                       "Name":  "Open Parent Folder",
+                                                                       "UUID":  "com.elgato.streamdeck.profile.backtoparent",
+                                                                       "Version":  "1.0"
+                                                                   },
+                                                        "Resources":  null,
+                                                        "Settings":  {
+
+                                                                     },
+                                                        "State":  0,
+                                                        "States":  [
+                                                                       {
+
+                                                                       }
+                                                                   ],
+                                                        "UUID":  "com.elgato.streamdeck.profile.backtoparent"
+                                                    },
+                                            "0,1":  {
+                                                        "ActionID":  "19111e7e-9f20-465e-b3d2-4ee8bb38f8c7",
+                                                        "LinkedTitle":  true,
+                                                        "Name":  "Note On/Off",
+                                                        "Plugin":  {
+                                                                       "Name":  "Midi",
+                                                                       "UUID":  "se.trevligaspel.midi",
+                                                                       "Version":  "4.1.0.1"
+                                                                   },
+                                                        "Resources":  null,
+                                                        "Settings":  {
+                                                                         "af":  "",
+                                                                         "aff":  null,
+                                                                         "afu":  null,
+                                                                         "b1i":  false,
+                                                                         "b2i":  true,
+                                                                         "btc":  false,
+                                                                         "bth":  true,
+                                                                         "btl":  false,
+                                                                         "btp":  false,
+                                                                         "btt":  false,
+                                                                         "ccs":  null,
+                                                                         "cf":  "",
+                                                                         "ct":  null,
+                                                                         "ctf":  null,
+                                                                         "el":  true,
+                                                                         "i9":  false,
+                                                                         "i9h":  "",
+                                                                         "id":  "\u003cspan class=\u0027ts-highlight3\u0027\u003e\u003c/span\u003e",
+                                                                         "lg":  [
+
+                                                                                ],
+                                                                         "lgn":  "",
+                                                                         "mc":  null,
+                                                                         "mip":  [
+
+                                                                                 ],
+                                                                         "mop":  [
+
+                                                                                 ],
+                                                                         "ndt":  [
+
+                                                                                 ],
+                                                                         "nit":  "",
+                                                                         "nl":  [
+                                                                                    {
+                                                                                        "sn":  "24",
+                                                                                        "sv":  "64"
+                                                                                    }
+                                                                                ],
+                                                                         "nln":  [
+
+                                                                                 ],
+                                                                         "nov":  null,
+                                                                         "pv":  "4.1.0.1",
+                                                                         "rb":  false,
+                                                                         "sa":  false,
+                                                                         "sc":  false,
+                                                                         "sct":  "",
+                                                                         "selg":  "Default group",
+                                                                         "sis":  true,
+                                                                         "slg":  false,
+                                                                         "smc":  "0",
+                                                                         "smi":  true,
+                                                                         "smip":  "loopMIDI Port",
+                                                                         "smop":  "loopMIDI Port",
+                                                                         "snc":  true,
+                                                                         "sni":  false,
+                                                                         "sno":  "same",
+                                                                         "snt":  "C4",
+                                                                         "spw":  "",
+                                                                         "stf":  true,
+                                                                         "tf":  null,
+                                                                         "tff":  "",
+                                                                         "tfp":  null
+                                                                     },
+                                                        "State":  0,
+                                                        "States":  [
+                                                                       {
+                                                                           "FontFamily":  "",
+                                                                           "FontSize":  12,
+                                                                           "FontStyle":  "",
+                                                                           "FontUnderline":  false,
+                                                                           "OutlineThickness":  2,
+                                                                           "ShowTitle":  true,
+                                                                           "Title":  "C1",
+                                                                           "TitleAlignment":  "middle",
+                                                                           "TitleColor":  "#ffffff"
+                                                                       },
+                                                                       {
+
+                                                                       }
+                                                                   ],
+                                                        "UUID":  "se.trevligaspel.midi.noteon"
+                                                    },
+                                            "1,0":  {
+                                                        "ActionID":  "8ec187bd-8d08-43bf-b902-2f1d994c0f21",
+                                                        "LinkedTitle":  true,
+                                                        "Name":  "Note On/Off",
+                                                        "Plugin":  {
+                                                                       "Name":  "Midi",
+                                                                       "UUID":  "se.trevligaspel.midi",
+                                                                       "Version":  "4.2.0.4"
+                                                                   },
+                                                        "Resources":  null,
+                                                        "Settings":  {
+                                                                         "af":  "",
+                                                                         "aff":  null,
+                                                                         "afu":  null,
+                                                                         "b1i":  false,
+                                                                         "b2i":  true,
+                                                                         "btc":  false,
+                                                                         "bth":  true,
+                                                                         "btl":  false,
+                                                                         "btp":  false,
+                                                                         "btt":  false,
+                                                                         "ccs":  null,
+                                                                         "cf":  "",
+                                                                         "ct":  null,
+                                                                         "ctf":  null,
+                                                                         "el":  true,
+                                                                         "i9":  false,
+                                                                         "i9h":  "",
+                                                                         "id":  "\u003cspan class=\u0027ts-highlight3\u0027\u003e\u003c/span\u003e",
+                                                                         "lg":  [
+
+                                                                                ],
+                                                                         "lgn":  "",
+                                                                         "mc":  null,
+                                                                         "mip":  [
+
+                                                                                 ],
+                                                                         "mop":  [
+
+                                                                                 ],
+                                                                         "ndt":  [
+
+                                                                                 ],
+                                                                         "nit":  "",
+                                                                         "nl":  [
+                                                                                    {
+                                                                                        "sn":  "27",
+                                                                                        "sv":  "64"
+                                                                                    }
+                                                                                ],
+                                                                         "nln":  [
+
+                                                                                 ],
+                                                                         "nov":  null,
+                                                                         "pv":  "4.1.0.1",
+                                                                         "rb":  false,
+                                                                         "sa":  false,
+                                                                         "sc":  false,
+                                                                         "sct":  "",
+                                                                         "selg":  "Default group",
+                                                                         "sis":  true,
+                                                                         "slg":  false,
+                                                                         "smc":  "0",
+                                                                         "smi":  true,
+                                                                         "smip":  "loopMIDI Port",
+                                                                         "smop":  "loopMIDI Port",
+                                                                         "snc":  true,
+                                                                         "sni":  false,
+                                                                         "sno":  "same",
+                                                                         "snt":  "C4",
+                                                                         "spw":  "",
+                                                                         "stf":  true,
+                                                                         "tf":  null,
+                                                                         "tff":  "",
+                                                                         "tfp":  null
+                                                                     },
+                                                        "State":  0,
+                                                        "States":  [
+                                                                       {
+                                                                           "FontFamily":  "",
+                                                                           "FontSize":  12,
+                                                                           "FontStyle":  "",
+                                                                           "FontUnderline":  false,
+                                                                           "OutlineThickness":  2,
+                                                                           "ShowTitle":  true,
+                                                                           "Title":  "D#1",
+                                                                           "TitleAlignment":  "middle",
+                                                                           "TitleColor":  "#ffffff"
+                                                                       },
+                                                                       {
+
+                                                                       }
+                                                                   ],
+                                                        "UUID":  "se.trevligaspel.midi.noteon"
+                                                    },
+                                            "1,1":  {
+                                                        "ActionID":  "e2e554fb-2c7d-4b24-8538-72fc80b45480",
+                                                        "LinkedTitle":  true,
+                                                        "Name":  "Note On/Off",
+                                                        "Plugin":  {
+                                                                       "Name":  "Midi",
+                                                                       "UUID":  "se.trevligaspel.midi",
+                                                                       "Version":  "4.2.0.4"
+                                                                   },
+                                                        "Resources":  null,
+                                                        "Settings":  {
+                                                                         "af":  "",
+                                                                         "aff":  null,
+                                                                         "afu":  null,
+                                                                         "b1i":  false,
+                                                                         "b2i":  true,
+                                                                         "btc":  false,
+                                                                         "bth":  true,
+                                                                         "btl":  false,
+                                                                         "btp":  false,
+                                                                         "btt":  false,
+                                                                         "ccs":  null,
+                                                                         "cf":  "",
+                                                                         "ct":  null,
+                                                                         "ctf":  null,
+                                                                         "el":  true,
+                                                                         "i9":  false,
+                                                                         "i9h":  "",
+                                                                         "id":  "\u003cspan class=\u0027ts-highlight3\u0027\u003e\u003c/span\u003e",
+                                                                         "lg":  [
+
+                                                                                ],
+                                                                         "lgn":  "",
+                                                                         "mc":  null,
+                                                                         "mip":  [
+
+                                                                                 ],
+                                                                         "mop":  [
+
+                                                                                 ],
+                                                                         "ndt":  [
+
+                                                                                 ],
+                                                                         "nit":  "",
+                                                                         "nl":  [
+                                                                                    {
+                                                                                        "sn":  "26",
+                                                                                        "sv":  "64"
+                                                                                    }
+                                                                                ],
+                                                                         "nln":  [
+
+                                                                                 ],
+                                                                         "nov":  null,
+                                                                         "pv":  "4.1.0.1",
+                                                                         "rb":  false,
+                                                                         "sa":  false,
+                                                                         "sc":  false,
+                                                                         "sct":  "",
+                                                                         "selg":  "Default group",
+                                                                         "sis":  true,
+                                                                         "slg":  false,
+                                                                         "smc":  "0",
+                                                                         "smi":  true,
+                                                                         "smip":  "loopMIDI Port",
+                                                                         "smop":  "loopMIDI Port",
+                                                                         "snc":  true,
+                                                                         "sni":  false,
+                                                                         "sno":  "same",
+                                                                         "snt":  "C4",
+                                                                         "spw":  "",
+                                                                         "stf":  true,
+                                                                         "tf":  null,
+                                                                         "tff":  "",
+                                                                         "tfp":  null
+                                                                     },
+                                                        "State":  0,
+                                                        "States":  [
+                                                                       {
+                                                                           "FontFamily":  "",
+                                                                           "FontSize":  12,
+                                                                           "FontStyle":  "",
+                                                                           "FontUnderline":  false,
+                                                                           "OutlineThickness":  2,
+                                                                           "ShowTitle":  true,
+                                                                           "Title":  "D1",
+                                                                           "TitleAlignment":  "middle",
+                                                                           "TitleColor":  "#ffffff"
+                                                                       },
+                                                                       {
+
+                                                                       }
+                                                                   ],
+                                                        "UUID":  "se.trevligaspel.midi.noteon"
+                                                    },
+                                            "2,0":  {
+                                                        "ActionID":  "6d3b4d21-b0bd-4bbb-87ed-26dc512af331",
+                                                        "LinkedTitle":  true,
+                                                        "Name":  "Note On/Off",
+                                                        "Plugin":  {
+                                                                       "Name":  "Midi",
+                                                                       "UUID":  "se.trevligaspel.midi",
+                                                                       "Version":  "4.2.0.4"
+                                                                   },
+                                                        "Resources":  null,
+                                                        "Settings":  {
+                                                                         "af":  "",
+                                                                         "aff":  null,
+                                                                         "afu":  null,
+                                                                         "b1i":  false,
+                                                                         "b2i":  true,
+                                                                         "btc":  false,
+                                                                         "bth":  true,
+                                                                         "btl":  false,
+                                                                         "btp":  false,
+                                                                         "btt":  false,
+                                                                         "ccs":  null,
+                                                                         "cf":  "",
+                                                                         "ct":  null,
+                                                                         "ctf":  null,
+                                                                         "el":  true,
+                                                                         "i9":  false,
+                                                                         "i9h":  "",
+                                                                         "id":  "\u003cspan class=\u0027ts-highlight3\u0027\u003e\u003c/span\u003e",
+                                                                         "lg":  [
+
+                                                                                ],
+                                                                         "lgn":  "",
+                                                                         "mc":  null,
+                                                                         "mip":  [
+
+                                                                                 ],
+                                                                         "mop":  [
+
+                                                                                 ],
+                                                                         "ndt":  [
+
+                                                                                 ],
+                                                                         "nit":  "",
+                                                                         "nl":  [
+                                                                                    {
+                                                                                        "sn":  "30",
+                                                                                        "sv":  "64"
+                                                                                    }
+                                                                                ],
+                                                                         "nln":  [
+
+                                                                                 ],
+                                                                         "nov":  null,
+                                                                         "pv":  "4.1.0.1",
+                                                                         "rb":  false,
+                                                                         "sa":  false,
+                                                                         "sc":  false,
+                                                                         "sct":  "",
+                                                                         "selg":  "Default group",
+                                                                         "sis":  true,
+                                                                         "slg":  false,
+                                                                         "smc":  "0",
+                                                                         "smi":  true,
+                                                                         "smip":  "loopMIDI Port",
+                                                                         "smop":  "loopMIDI Port",
+                                                                         "snc":  true,
+                                                                         "sni":  false,
+                                                                         "sno":  "same",
+                                                                         "snt":  "C4",
+                                                                         "spw":  "",
+                                                                         "stf":  true,
+                                                                         "tf":  null,
+                                                                         "tff":  "",
+                                                                         "tfp":  null
+                                                                     },
+                                                        "State":  0,
+                                                        "States":  [
+                                                                       {
+                                                                           "FontFamily":  "",
+                                                                           "FontSize":  12,
+                                                                           "FontStyle":  "",
+                                                                           "FontUnderline":  false,
+                                                                           "OutlineThickness":  2,
+                                                                           "ShowTitle":  true,
+                                                                           "Title":  "F#1",
+                                                                           "TitleAlignment":  "middle",
+                                                                           "TitleColor":  "#ffffff"
+                                                                       },
+                                                                       {
+
+                                                                       }
+                                                                   ],
+                                                        "UUID":  "se.trevligaspel.midi.noteon"
+                                                    },
+                                            "2,1":  {
+                                                        "ActionID":  "a2fcbd2e-c3dd-425f-9eb8-4b7960e05d65",
+                                                        "LinkedTitle":  true,
+                                                        "Name":  "Note On/Off",
+                                                        "Plugin":  {
+                                                                       "Name":  "Midi",
+                                                                       "UUID":  "se.trevligaspel.midi",
+                                                                       "Version":  "4.2.0.4"
+                                                                   },
+                                                        "Resources":  null,
+                                                        "Settings":  {
+                                                                         "af":  "",
+                                                                         "aff":  null,
+                                                                         "afu":  null,
+                                                                         "b1i":  false,
+                                                                         "b2i":  true,
+                                                                         "btc":  false,
+                                                                         "bth":  true,
+                                                                         "btl":  false,
+                                                                         "btp":  false,
+                                                                         "btt":  false,
+                                                                         "ccs":  null,
+                                                                         "cf":  "",
+                                                                         "ct":  null,
+                                                                         "ctf":  null,
+                                                                         "el":  true,
+                                                                         "i9":  false,
+                                                                         "i9h":  "",
+                                                                         "id":  "\u003cspan class=\u0027ts-highlight3\u0027\u003e\u003c/span\u003e",
+                                                                         "lg":  [
+
+                                                                                ],
+                                                                         "lgn":  "",
+                                                                         "mc":  null,
+                                                                         "mip":  [
+
+                                                                                 ],
+                                                                         "mop":  [
+
+                                                                                 ],
+                                                                         "ndt":  [
+
+                                                                                 ],
+                                                                         "nit":  "",
+                                                                         "nl":  [
+                                                                                    {
+                                                                                        "sn":  "28",
+                                                                                        "sv":  "64"
+                                                                                    }
+                                                                                ],
+                                                                         "nln":  [
+
+                                                                                 ],
+                                                                         "nov":  null,
+                                                                         "pv":  "4.1.0.1",
+                                                                         "rb":  false,
+                                                                         "sa":  false,
+                                                                         "sc":  false,
+                                                                         "sct":  "",
+                                                                         "selg":  "Default group",
+                                                                         "sis":  true,
+                                                                         "slg":  false,
+                                                                         "smc":  "0",
+                                                                         "smi":  true,
+                                                                         "smip":  "loopMIDI Port",
+                                                                         "smop":  "loopMIDI Port",
+                                                                         "snc":  true,
+                                                                         "sni":  false,
+                                                                         "sno":  "same",
+                                                                         "snt":  "C4",
+                                                                         "spw":  "",
+                                                                         "stf":  true,
+                                                                         "tf":  null,
+                                                                         "tff":  "",
+                                                                         "tfp":  null
+                                                                     },
+                                                        "State":  0,
+                                                        "States":  [
+                                                                       {
+                                                                           "FontFamily":  "",
+                                                                           "FontSize":  12,
+                                                                           "FontStyle":  "",
+                                                                           "FontUnderline":  false,
+                                                                           "OutlineThickness":  2,
+                                                                           "ShowTitle":  true,
+                                                                           "Title":  "E1",
+                                                                           "TitleAlignment":  "middle",
+                                                                           "TitleColor":  "#ffffff"
+                                                                       },
+                                                                       {
+
+                                                                       }
+                                                                   ],
+                                                        "UUID":  "se.trevligaspel.midi.noteon"
+                                                    },
+                                            "3,0":  {
+                                                        "ActionID":  "25b04733-87ea-4266-90ff-e47eabfae59b",
+                                                        "LinkedTitle":  true,
+                                                        "Name":  "Note On/Off",
+                                                        "Plugin":  {
+                                                                       "Name":  "Midi",
+                                                                       "UUID":  "se.trevligaspel.midi",
+                                                                       "Version":  "4.2.0.4"
+                                                                   },
+                                                        "Resources":  null,
+                                                        "Settings":  {
+                                                                         "af":  "",
+                                                                         "aff":  null,
+                                                                         "afu":  null,
+                                                                         "b1i":  false,
+                                                                         "b2i":  true,
+                                                                         "btc":  false,
+                                                                         "bth":  true,
+                                                                         "btl":  false,
+                                                                         "btp":  false,
+                                                                         "btt":  false,
+                                                                         "ccs":  null,
+                                                                         "cf":  "",
+                                                                         "ct":  null,
+                                                                         "ctf":  null,
+                                                                         "el":  true,
+                                                                         "i9":  false,
+                                                                         "i9h":  "",
+                                                                         "id":  "\u003cspan class=\u0027ts-highlight3\u0027\u003e\u003c/span\u003e",
+                                                                         "lg":  [
+
+                                                                                ],
+                                                                         "lgn":  "",
+                                                                         "mc":  null,
+                                                                         "mip":  [
+
+                                                                                 ],
+                                                                         "mop":  [
+
+                                                                                 ],
+                                                                         "ndt":  [
+
+                                                                                 ],
+                                                                         "nit":  "",
+                                                                         "nl":  [
+                                                                                    {
+                                                                                        "sn":  "31",
+                                                                                        "sv":  "64"
+                                                                                    }
+                                                                                ],
+                                                                         "nln":  [
+
+                                                                                 ],
+                                                                         "nov":  null,
+                                                                         "pv":  "4.1.0.1",
+                                                                         "rb":  false,
+                                                                         "sa":  false,
+                                                                         "sc":  false,
+                                                                         "sct":  "",
+                                                                         "selg":  "Default group",
+                                                                         "sis":  true,
+                                                                         "slg":  false,
+                                                                         "smc":  "0",
+                                                                         "smi":  true,
+                                                                         "smip":  "loopMIDI Port",
+                                                                         "smop":  "loopMIDI Port",
+                                                                         "snc":  true,
+                                                                         "sni":  false,
+                                                                         "sno":  "same",
+                                                                         "snt":  "C4",
+                                                                         "spw":  "",
+                                                                         "stf":  true,
+                                                                         "tf":  null,
+                                                                         "tff":  "",
+                                                                         "tfp":  null
+                                                                     },
+                                                        "State":  0,
+                                                        "States":  [
+                                                                       {
+                                                                           "FontFamily":  "",
+                                                                           "FontSize":  12,
+                                                                           "FontStyle":  "",
+                                                                           "FontUnderline":  false,
+                                                                           "OutlineThickness":  2,
+                                                                           "ShowTitle":  true,
+                                                                           "Title":  "G1",
+                                                                           "TitleAlignment":  "middle",
+                                                                           "TitleColor":  "#ffffff"
+                                                                       },
+                                                                       {
+
+                                                                       }
+                                                                   ],
+                                                        "UUID":  "se.trevligaspel.midi.noteon"
+                                                    },
+                                            "3,1":  {
+                                                        "ActionID":  "1b20a3d7-9dcb-4732-9f1c-be0b6854d93c",
+                                                        "LinkedTitle":  true,
+                                                        "Name":  "Note On/Off",
+                                                        "Plugin":  {
+                                                                       "Name":  "Midi",
+                                                                       "UUID":  "se.trevligaspel.midi",
+                                                                       "Version":  "4.2.0.4"
+                                                                   },
+                                                        "Resources":  null,
+                                                        "Settings":  {
+                                                                         "af":  "",
+                                                                         "aff":  null,
+                                                                         "afu":  null,
+                                                                         "b1i":  false,
+                                                                         "b2i":  true,
+                                                                         "btc":  false,
+                                                                         "bth":  true,
+                                                                         "btl":  false,
+                                                                         "btp":  false,
+                                                                         "btt":  false,
+                                                                         "ccs":  null,
+                                                                         "cf":  "",
+                                                                         "ct":  null,
+                                                                         "ctf":  null,
+                                                                         "el":  true,
+                                                                         "i9":  false,
+                                                                         "i9h":  "",
+                                                                         "id":  "\u003cspan class=\u0027ts-highlight3\u0027\u003e\u003c/span\u003e",
+                                                                         "lg":  [
+
+                                                                                ],
+                                                                         "lgn":  "",
+                                                                         "mc":  null,
+                                                                         "mip":  [
+
+                                                                                 ],
+                                                                         "mop":  [
+
+                                                                                 ],
+                                                                         "ndt":  [
+
+                                                                                 ],
+                                                                         "nit":  "",
+                                                                         "nl":  [
+                                                                                    {
+                                                                                        "sn":  "29",
+                                                                                        "sv":  "64"
+                                                                                    }
+                                                                                ],
+                                                                         "nln":  [
+
+                                                                                 ],
+                                                                         "nov":  null,
+                                                                         "pv":  "4.1.0.1",
+                                                                         "rb":  false,
+                                                                         "sa":  false,
+                                                                         "sc":  false,
+                                                                         "sct":  "",
+                                                                         "selg":  "Default group",
+                                                                         "sis":  true,
+                                                                         "slg":  false,
+                                                                         "smc":  "0",
+                                                                         "smi":  true,
+                                                                         "smip":  "loopMIDI Port",
+                                                                         "smop":  "loopMIDI Port",
+                                                                         "snc":  true,
+                                                                         "sni":  false,
+                                                                         "sno":  "same",
+                                                                         "snt":  "C4",
+                                                                         "spw":  "",
+                                                                         "stf":  true,
+                                                                         "tf":  null,
+                                                                         "tff":  "",
+                                                                         "tfp":  null
+                                                                     },
+                                                        "State":  0,
+                                                        "States":  [
+                                                                       {
+                                                                           "FontFamily":  "",
+                                                                           "FontSize":  12,
+                                                                           "FontStyle":  "",
+                                                                           "FontUnderline":  false,
+                                                                           "OutlineThickness":  2,
+                                                                           "ShowTitle":  true,
+                                                                           "Title":  "F1",
+                                                                           "TitleAlignment":  "middle",
+                                                                           "TitleColor":  "#ffffff"
+                                                                       },
+                                                                       {
+
+                                                                       }
+                                                                   ],
+                                                        "UUID":  "se.trevligaspel.midi.noteon"
+                                                    }
+                                        },
+                            "Type":  "Keypad"
+                        },
+                        {
+                            "Actions":  null,
+                            "Type":  "Encoder"
+                        }
+                    ],
+    "Icon":  "",
+    "Name":  "Notes"
+}

@@ -78,14 +78,20 @@ function New-AnimatedNavGif([int]$pageIndex, [int]$baseR, [int]$baseG, [int]$bas
   $frameDir = Join-Path ([System.IO.Path]::GetTempPath()) ("sd-nav-" + [guid]::NewGuid().ToString('N'))
   New-Item -ItemType Directory -Force -Path $frameDir | Out-Null
   try {
-    $frameCount = 10
+    # Full black <-> full section color pulse (scale 0..1) for glanceable active-page highlight
+    $frameCount = 12
     for ($i = 0; $i -lt $frameCount; $i++) {
       $t = $i / [double]$frameCount
       $wave = 0.5 + 0.5 * [Math]::Sin(2.0 * [Math]::PI * $t)
-      $scale = 0.55 + 0.45 * $wave
-      $c = Get-ScaledColor $baseR $baseG $baseB $scale
-      $borderW = [int][Math]::Round(3 + 5 * $wave)
-      $bright = Get-ScaledColor $baseR $baseG $baseB (0.85 + 0.35 * $wave)
+      $scale = $wave  # 0 = black, 1 = normal section color
+      if ($scale -lt 0.02) {
+        $c = @{ R = 0; G = 0; B = 0 }
+      }
+      else {
+        $c = Get-ScaledColor $baseR $baseG $baseB $scale
+      }
+      $borderW = [int][Math]::Round(2 + 6 * $wave)
+      $bright = Get-ScaledColor $baseR $baseG $baseB ([Math]::Min(1.2, 0.4 + 0.8 * $wave))
       $bmp = New-NavKeyBitmap $pageIndex $c.R $c.G $c.B $borderW $bright.R $bright.G $bright.B
       $framePath = Join-Path $frameDir ("frame-{0:D2}.png" -f $i)
       Save-BitmapPng $bmp $framePath
@@ -105,7 +111,7 @@ function New-AnimatedNavGif([int]$pageIndex, [int]$baseR, [int]$baseG, [int]$bas
     $pattern = Join-Path $frameDir 'frame-%02d.png'
     $args = @(
       '-y', '-hide_banner', '-loglevel', 'error',
-      '-framerate', '8',
+      '-framerate', '6',
       '-i', $pattern,
       '-loop', '0',
       '-gifflags', '+transdiff',
